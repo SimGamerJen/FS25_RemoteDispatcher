@@ -6,9 +6,16 @@ The initial use case is cinematic/story-driven gameplay: prepare a vehicle norma
 
 ## Current status
 
-**v0.1.0.0 — proof of concept / single-player test build**
+**v0.1.0.1 — proof of concept / single-player test build**
 
 The first implementation deliberately keeps configuration inside AutoDrive and Courseplay. Remote Dispatcher only selects a compatible owned vehicle and tells its existing automation to start or stop.
+
+### v0.1.0.1 discovery hotfix
+
+- Detect AutoDrive capability from the state injected onto the vehicle (`vehicle.ad.stateModule`) instead of requiring the global `AutoDrive` table merely to list a vehicle.
+- Prefer the local player's explicit `farmId` while resolving ownership, which is more appropriate for the intended on-foot workflow.
+- Guard the AutoDrive external-interface call and retain a vehicle-level mode fallback.
+- Write a concise discovery census and candidate diagnostics to `log.txt`. Search for `[RemoteDispatcher] Discovery` if no vehicle is listed.
 
 ## Intended workflow
 
@@ -44,6 +51,8 @@ Suggested first test:
 2. Exit the tractor.
 3. Select it in Remote Dispatcher and trigger the remote action.
 4. Repeat with a simple Courseplay fieldwork job.
+
+If the dispatcher still reports no compatible vehicle, send the relevant `[RemoteDispatcher] Discovery` lines from `log.txt` (or the whole log). The census reports mission vehicle count, root vehicles, farm ownership, raw AD state, AD/CP capability and accepted vehicles.
 
 ## Longer-term direction
 
