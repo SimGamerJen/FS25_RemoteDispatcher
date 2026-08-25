@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
+    <author>SimGamerJen / ChatGPT prototype</author>
+    <version>0.1.0.0</version>
+
+    <title>
+        <en>Remote Dispatcher</en>
+    </title>
+
+    <description>
+        <en><![CDATA[
+Proof-of-concept remote dispatcher for AutoDrive and Courseplay.
+
+Prepare a vehicle's AutoDrive destination/mode or Courseplay job normally, leave the vehicle, select it in the dispatcher overlay, then start or stop that automation remotely.
+
+This alpha prototype is intended for single-player testing and cinematic workflows.
+        ]]></en>
+    </description>
+
+    <multiplayer supported="false" />
+    <l10n filenamePrefix="translations/l10n" defaultLanguage="en" />
+
+    <extraSourceFiles>
+        <sourceFile filename="scripts/RemoteDispatcher.lua" />
+    </extraSourceFiles>
+
+    <actions>
+        <action name="RDC_TOGGLE_UI" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_PREVIOUS_VEHICLE" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_NEXT_VEHICLE" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_SWITCH_PROVIDER" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="RDC_TOGGLE_UI">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
+        </actionBinding>
+        <actionBinding action="RDC_PREVIOUS_VEHICLE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_pageup" />
+        </actionBinding>
+        <actionBinding action="RDC_NEXT_VEHICLE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_pagedown" />
+        </actionBinding>
+        <actionBinding action="RDC_SWITCH_PROVIDER">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_home" />
+        </actionBinding>
+        <actionBinding action="RDC_REMOTE_ACTION">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
+        </actionBinding>
+    </inputBinding>
+</modDesc>
