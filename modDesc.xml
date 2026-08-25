@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.1.0.1</version>
+    <version>0.1.0.2</version>
 
     <title>
         <en>Remote Dispatcher</en>
@@ -30,6 +30,7 @@ This alpha prototype is intended for single-player testing and cinematic workflo
         <action name="RDC_PREVIOUS_VEHICLE" category="ONFOOT" axisType="HALF" />
         <action name="RDC_NEXT_VEHICLE" category="ONFOOT" axisType="HALF" />
         <action name="RDC_SWITCH_PROVIDER" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_CONFIRM" category="ONFOOT" axisType="HALF" />
         <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
     </actions>
 
@@ -38,13 +39,17 @@ This alpha prototype is intended for single-player testing and cinematic workflo
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
         </actionBinding>
         <actionBinding action="RDC_PREVIOUS_VEHICLE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_pageup" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_up" />
         </actionBinding>
         <actionBinding action="RDC_NEXT_VEHICLE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_pagedown" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_down" />
         </actionBinding>
         <actionBinding action="RDC_SWITCH_PROVIDER">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_home" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_left" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_right" />
+        </actionBinding>
+        <actionBinding action="RDC_CONFIRM">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_return" />
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
