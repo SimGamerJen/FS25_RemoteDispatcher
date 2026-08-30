@@ -33,7 +33,9 @@ All actions are normal FS25 input actions and can be remapped.
 
 HelperProfiles is optional. Without it, Remote Dispatcher uses `AUTO` and the normal game/automation helper-selection flow.
 
-Named worker assignment requires **HelperProfiles API v7**, published by **FS25_HelperProfiles 2.1.1.0 or newer**. A named assignment is scoped to the dispatch request and is fail-closed: if the assigned worker is unavailable, Remote Dispatcher refuses the start instead of silently substituting another worker.
+Named worker assignment requires a compatible **HelperProfiles API v7** build. A named assignment is scoped to the dispatch request and is fail-closed: if the assigned worker is unavailable, Remote Dispatcher refuses the start instead of silently substituting another worker.
+
+For the alpha-candidate test cycle, use the API v7 HelperProfiles test build supplied with the test package. Promoting API v7 into a formal HelperProfiles release is tracked as an alpha release-gate item.
 
 ## Per-save persistence
 
@@ -73,7 +75,7 @@ The distant-vehicle wake logic keeps the remotely dispatched vehicle active long
 
 - Farming Simulator 25.
 - AutoDrive and/or Courseplay for the corresponding automation functions.
-- HelperProfiles 2.1.1.0+ only if named worker assignment is wanted.
+- HelperProfiles API v7 only if named worker assignment is wanted.
 - Single-player only in the current alpha.
 
 See `docs/ALPHA_RELEASE_CHECKLIST.md` for the release gate and known beta follow-up work.
