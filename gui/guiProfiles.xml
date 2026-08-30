@@ -38,11 +38,5 @@
         <textAlignment value="left" />
     </Profile>
 
-    <Profile name="rdButtonProvider" extends="buttonExtra1">
-        <inputAction value="RDC_GUI_PROVIDER" />
-    </Profile>
-
-    <Profile name="rdButtonWorker" extends="buttonExtra1">
-        <inputAction value="RDC_GUI_WORKER" />
-    </Profile>
+    <Profile name="rdButtonAction" extends="buttonExtra1" />
 </GUIProfiles>
