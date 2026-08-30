@@ -4,27 +4,28 @@ Remote Dispatcher is a Farming Simulator 25 script mod for remotely starting and
 
 ## Current status
 
-**v0.1.0.3 — alpha / single-player test build**
+**v0.1.0.4 — alpha / single-player test build**
 
 The target vehicle is persistent: once selected, player distance does not affect remote dispatch. Proximity is used only for the initial target when no selection has yet been made.
 
 ## Controls
 
 - **Ctrl + Alt + D** — open/close Remote Dispatcher.
-- While the Dispatcher is visible: **Up / Down** selects a vehicle.
-- While visible: **Left / Right** selects AutoDrive or Courseplay where both are available.
-- While visible: **Enter** starts/stops the selected automation.
-- **Ctrl + Alt + R** — start/stop the retained target remotely, including with the Dispatcher closed or the normal HUD hidden.
+- **- / =** — previous/next compatible vehicle while the Dispatcher is open.
+- **\** — switch AutoDrive/Courseplay for the selected vehicle.
+- **Enter** — start/stop the selected vehicle while the Dispatcher is open.
+- **Ctrl + Alt + R** — start/stop the retained target from anywhere, including with the Dispatcher closed.
 
-The arrow and Enter keys are raw Dispatcher-only inputs; they are no longer registered as normal gameplay actions.
+All bindings are normal FS25 actions and can be remapped in Controls.
 
-## v0.1.0.3 changes
+## v0.1.0.4 changes
 
 - Persistent remote selection independent of player distance.
-- Raw Up/Down/Left/Right/Enter navigation to avoid action-context conflicts.
+- Replaced arrow navigation with dedicated `-`, `=`, `\` and Enter actions so Dispatcher controls no longer move the player/camera.
 - Fixed-column overlay for vehicle, automation, state, target/course and distance.
-- Dispatcher visibility now follows the main FS25 HUD.
+- Dispatcher visibility follows the main FS25 HUD.
 - Ctrl+Alt+R remains available while the panel/HUD is hidden for cinematic triggering.
+- Remotely started AD/CP vehicles are explicitly woken with `raiseActive()` and held active for five seconds so their automation update loop can begin without player proximity.
 - Existing AutoDrive discovery/start diagnostics retained.
 
 ## Workflow
