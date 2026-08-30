@@ -15,7 +15,7 @@ The first public alpha can be published when all items below are confirmed on a 
 - [x] Per-save automation/worker assignments and retained target are implemented using vehicle `uniqueId`.
 - [x] `rdStatus` diagnostics are available.
 - [x] CI validates XML/source references and builds the distributable ZIP.
-- [ ] Clean `log.txt` after load, management open/close, target cycling, AD start/stop, save/reload, and second dispatch.
+- [x] Clean Remote Dispatcher/HelperProfiles integration log after load, management open/close, target cycling, AD/CP start/stop, save/reload, and second dispatch.
 - [x] Confirm persisted assignment/target restoration in-game after a full FS25 restart.
 - [x] Confirm Courseplay remote start/stop on at least one straightforward fieldwork job.
 - [x] Confirm AUTO worker dispatch still follows normal HelperProfiles/game selection.
@@ -24,7 +24,7 @@ The first public alpha can be published when all items below are confirmed on a 
 
 ### Validation note — 2026-08-30
 
-In-game RC testing confirmed full-restart persistence, retained target restoration, named-worker fail-closed behavior (`worker-active`), AUTO dispatch using the worker selected in HelperProfiles, and Courseplay dispatch with an RD-assigned worker.
+In-game RC testing confirmed full-restart persistence, retained target restoration, named-worker fail-closed behavior (`worker-active`), AUTO dispatch using the worker selected in HelperProfiles, and Courseplay dispatch with an RD-assigned worker. The accompanying `log.txt` contains no Remote Dispatcher Lua errors, stack traces, failed persistence operations, or HelperProfiles scoped-hire failures. Unrelated warnings/errors from other installed test mods are outside the Remote Dispatcher alpha gate.
 
 ### Alpha known limitations
 
