@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.2.0.0</version>
+    <version>0.2.0.1</version>
 
     <title>
         <en>Remote Dispatcher</en>
@@ -11,7 +11,7 @@
         <en><![CDATA[
 Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the vehicle.
 
-Version 0.2 introduces a proper dispatcher GUI and optional HelperProfiles API v7 integration. Vehicles can be assigned a specific enabled worker or left on AUTO. Named assignments are enforced only for the scoped hire triggered by that dispatch and do not change the normal HelperProfiles selection.
+Version 0.2.0.1 uses a compact cinematic setup GUI. Selecting a vehicle retains it as the remote target; choose AutoDrive/Courseplay and an optional HelperProfiles worker, close the GUI, position the camera, then use Ctrl+Alt+R to start or stop the vehicle remotely.
 
 Single-player alpha intended for testing and cinematic workflows.
         ]]></en>
@@ -33,6 +33,8 @@ Single-player alpha intended for testing and cinematic workflows.
     <actions>
         <action name="RDC_TOGGLE_UI" category="ONFOOT" axisType="HALF" />
         <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_GUI_PROVIDER" category="MENU" axisType="HALF" />
+        <action name="RDC_GUI_WORKER" category="MENU" axisType="HALF" />
     </actions>
 
     <inputBinding>
@@ -41,6 +43,12 @@ Single-player alpha intended for testing and cinematic workflows.
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
+        </actionBinding>
+        <actionBinding action="RDC_GUI_PROVIDER">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_x" />
+        </actionBinding>
+        <actionBinding action="RDC_GUI_WORKER">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_c" />
         </actionBinding>
     </inputBinding>
 </modDesc>
