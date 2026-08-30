@@ -1,13 +1,12 @@
--- FS25_RemoteDispatcher v0.1.0.3
+-- FS25_RemoteDispatcher v0.1.0.4
 -- Persistent remote target UI/input/HUD integration layer.
 
 if RemoteDispatcher == nil then
-    Logging.error("[RemoteDispatcher] v0.1.0.3 UI fix loaded before RemoteDispatcher.lua")
+    Logging.error("[RemoteDispatcher] v0.1.0.4 UI fix loaded before RemoteDispatcher.lua")
     return
 end
 
-RemoteDispatcher.VERSION = "0.1.0.3"
-RemoteDispatcher._lastRawInputAt = RemoteDispatcher._lastRawInputAt or 0
+RemoteDispatcher.VERSION = "0.1.0.4"
 
 local function rdWarn(fmt, ...)
     Logging.warning("[RemoteDispatcher] " .. fmt, ...)
@@ -27,7 +26,7 @@ local function rdCall(object, methodName, ...)
 end
 
 -- Compatibility helpers so a repository checkout works with the original
--- controller as well as the packaged 0.1.0.2 controller.
+-- controller as well as the packaged controller.
 function RemoteDispatcher:getCourseplayCourseText(vehicle)
     if vehicle == nil then return nil end
     if vehicle.getCurrentCpCourseName ~= nil then
@@ -60,9 +59,7 @@ function RemoteDispatcher:drawTextLine(x, y, size, text, r, g, b, a)
     renderText(x, y, size, tostring(text or ""))
 end
 
--- The selected vehicle is already retained by the 0.1.0.2 discovery layer.
 -- Distance is display-only: no remote action checks player-to-vehicle range.
-
 function RemoteDispatcher:isMainHudVisible()
     if g_currentMission == nil or g_currentMission.hud == nil then return false end
 
@@ -84,8 +81,6 @@ function RemoteDispatcher:isMainHudVisible()
         if hud[fieldName] ~= nil then return hud[fieldName] == true end
     end
 
-    -- Standard FS25 hide-HUD also hides GameInfoDisplay, making it a useful
-    -- fallback when the HUD root itself has no public visibility accessor.
     local gameInfoDisplay = hud.gameInfoDisplay
     if gameInfoDisplay ~= nil and gameInfoDisplay.getVisible ~= nil then
         local ok, visible = rdCall(gameInfoDisplay, "getVisible")
@@ -95,9 +90,14 @@ function RemoteDispatcher:isMainHudVisible()
     return true
 end
 
--- Only global open/close and cinematic remote trigger remain ordinary FS25
--- actions. Up/Down/Left/Right/Enter are captured directly while the panel is
--- visible, avoiding gameplay/action-context conflicts.
+-- Dedicated FS25 actions replace raw arrow-key input. The callbacks remain
+-- gated by isOpen, so navigation actions do nothing while the panel is closed.
+function RemoteDispatcher:onConfirm(actionName, inputValue)
+    if (inputValue or 0) <= 0 or not self.isOpen then return end
+    self.selectionInitialized = true
+    self:executeSelected()
+end
+
 function RemoteDispatcher:registerActionEvents()
     if g_inputBinding == nil then return end
 
@@ -117,8 +117,8 @@ function RemoteDispatcher:registerActionEvents()
         if ok and eventId ~= nil then
             table.insert(self.actionEventIds, eventId)
             if g_inputBinding.setActionEventText ~= nil then
-                local text = g_i18n ~= nil and g_i18n:getText(textKey) or actionName
-                g_inputBinding:setActionEventText(eventId, text)
+                local label = g_i18n ~= nil and g_i18n:getText(textKey) or actionName
+                g_inputBinding:setActionEventText(eventId, label)
             end
             if g_inputBinding.setActionEventTextVisibility ~= nil then
                 g_inputBinding:setActionEventTextVisibility(eventId, visible == true)
@@ -127,37 +127,15 @@ function RemoteDispatcher:registerActionEvents()
     end
 
     register("RDC_TOGGLE_UI", self.onToggleUI, "input_RDC_TOGGLE_UI", true)
+    register("RDC_SELECT_PREVIOUS", self.onPreviousVehicle, "input_RDC_SELECT_PREVIOUS", false)
+    register("RDC_SELECT_NEXT", self.onNextVehicle, "input_RDC_SELECT_NEXT", false)
+    register("RDC_PROVIDER_CYCLE", self.onSwitchProvider, "input_RDC_PROVIDER_CYCLE", false)
+    register("RDC_EXECUTE", self.onConfirm, "input_RDC_EXECUTE", false)
     register("RDC_REMOTE_ACTION", self.onRemoteAction, "input_RDC_REMOTE_ACTION", true)
 end
 
+-- Do not consume raw movement/camera keys.
 function RemoteDispatcher:keyEvent(unicode, sym, modifier, isDown)
-    if not isDown or not self.isOpen or Input == nil then return false end
-    if not self:isMainHudVisible() then return false end
-
-    local now = g_time or 0
-    if now - (self._lastRawInputAt or 0) < 80 then return false end
-
-    local used = false
-    if sym == Input.KEY_up then
-        self:selectRelative(-1)
-        used = true
-    elseif sym == Input.KEY_down then
-        self:selectRelative(1)
-        used = true
-    elseif sym == Input.KEY_left or sym == Input.KEY_right then
-        self:switchProvider()
-        used = true
-    elseif sym == Input.KEY_return
-        or (Input.KEY_KP_enter ~= nil and sym == Input.KEY_KP_enter) then
-        self.selectionInitialized = true
-        self:executeSelected()
-        used = true
-    end
-
-    if used then
-        self._lastRawInputAt = now
-        return true
-    end
     return false
 end
 
@@ -262,7 +240,7 @@ function RemoteDispatcher:draw()
     y = y - 0.026
     self:drawTextLine(
         x, y, 0.0115,
-        "Up/Down Select    Left/Right AD/CP    Enter Start/Stop    Ctrl+Alt+R Remote    Ctrl+Alt+D Close",
+        "- / = Select    \\ AD/CP    Enter Start/Stop    Ctrl+Alt+R Remote    Ctrl+Alt+D Close",
         0.78, 0.78, 0.78, 1.0
     )
 
