@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.2.0.1</version>
+    <version>0.2.1.0</version>
 
-    <title>
-        <en>Remote Dispatcher</en>
-    </title>
-
-    <description>
-        <en><![CDATA[
+    <title><en>Remote Dispatcher</en></title>
+    <description><en><![CDATA[
 Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the vehicle.
 
-Version 0.2.0.1 uses a compact cinematic setup GUI. Selecting a vehicle retains it as the remote target; choose AutoDrive/Courseplay and an optional HelperProfiles worker, close the GUI, position the camera, then use Ctrl+Alt+R to start or stop the vehicle remotely.
+The mod has two interfaces: a management GUI for per-vehicle automation/worker setup, and a lightweight in-game selector for choosing the retained cinematic target. Ctrl+Alt+R remotely starts/stops the target selected in the in-game selector.
 
 Single-player alpha intended for testing and cinematic workflows.
-        ]]></en>
-    </description>
+    ]]></en></description>
 
     <multiplayer supported="false" />
     <l10n filenamePrefix="translations/l10n" defaultLanguage="en" />
@@ -26,29 +21,34 @@ Single-player alpha intended for testing and cinematic workflows.
         <sourceFile filename="scripts/RemoteDispatcherUIFix.lua" />
         <sourceFile filename="scripts/RemoteDispatcherActivationFix.lua" />
         <sourceFile filename="scripts/RemoteDispatcherHelperProfiles.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherState.lua" />
         <sourceFile filename="scripts/RemoteDispatcherScreen.lua" />
-        <sourceFile filename="scripts/RemoteDispatcherGuiStateFix.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherSelector.lua" />
     </extraSourceFiles>
 
     <actions>
-        <action name="RDC_TOGGLE_UI" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_TOGGLE_SELECTOR" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_OPEN_MANAGEMENT" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_CYCLE_TARGET" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_CYCLE_TARGET_PREVIOUS" category="ONFOOT" axisType="HALF" />
         <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_GUI_PROVIDER" category="MENU" axisType="HALF" />
-        <action name="RDC_GUI_WORKER" category="MENU" axisType="HALF" />
     </actions>
 
     <inputBinding>
-        <actionBinding action="RDC_TOGGLE_UI">
+        <actionBinding action="RDC_TOGGLE_SELECTOR">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
+        </actionBinding>
+        <actionBinding action="RDC_OPEN_MANAGEMENT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_m" />
+        </actionBinding>
+        <actionBinding action="RDC_CYCLE_TARGET">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_equals" />
+        </actionBinding>
+        <actionBinding action="RDC_CYCLE_TARGET_PREVIOUS">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_minus" />
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
-        </actionBinding>
-        <actionBinding action="RDC_GUI_PROVIDER">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_x" />
-        </actionBinding>
-        <actionBinding action="RDC_GUI_WORKER">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_c" />
         </actionBinding>
     </inputBinding>
 </modDesc>
