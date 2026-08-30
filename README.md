@@ -9,7 +9,7 @@ Remote Dispatcher now has two separate interfaces:
 - **Management GUI**: per-vehicle automation and preferred HelperProfiles worker assignment.
 - **In-game target selector**: lightweight HUD used while staging cinematics to select the retained remote target.
 
-The management screen never starts a job. Remote execution always comes from the retained selector target.
+The management screen never starts a job and browsing it does not change the live target. Remote execution always comes from the vehicle selected in the in-game selector.
 
 ## Controls
 
