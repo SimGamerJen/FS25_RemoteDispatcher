@@ -27,6 +27,7 @@ Single-player alpha intended for testing and cinematic workflows.
         <sourceFile filename="scripts/RemoteDispatcherActivationFix.lua" />
         <sourceFile filename="scripts/RemoteDispatcherHelperProfiles.lua" />
         <sourceFile filename="scripts/RemoteDispatcherScreen.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherGuiStateFix.lua" />
     </extraSourceFiles>
 
     <actions>
