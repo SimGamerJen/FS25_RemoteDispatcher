@@ -7,21 +7,24 @@
     <description><en><![CDATA[
 Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the vehicle.
 
-Use the management screen to configure each vehicle's automation provider and optional HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained cinematic target, position the camera, then press Ctrl+Alt+R to start or stop that vehicle remotely.
+Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained cinematic target, position the camera, then press Ctrl+Alt+R to start or stop that vehicle remotely.
 
-Version 0.3.0.0 adds per-save persistence for automation/worker assignments and the retained target. HelperProfiles remains optional; named worker assignment requires a compatible HelperProfiles build publishing API v7.
+Version 0.3.0.0 adds per-save persistence for automation/worker assignments and the retained target. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
 
-Early alpha. Single-player only.
+Early alpha. Single-player only. Back up important savegames before testing.
     ]]></en></description>
 
     <changelog><en><![CDATA[
 0.3.0.0:
+- First public early-alpha release.
 - Added per-save persistence keyed to FS25 vehicle unique IDs.
 - Automation provider and HelperProfiles worker assignments now survive save reloads.
 - The retained cinematic target is restored when the save is reopened.
 - Added rdStatus support diagnostics for alpha testing.
 - Retained the two-pane management GUI and measured in-game target selector from 0.2.2.0.
-- Named worker assignment requires HelperProfiles API v7; HelperProfiles remains optional.
+- Named worker assignment uses HelperProfiles Integration API v7.
+- Public alpha support requires HelperProfiles 2.1.1.0.
+- Named-worker dispatch is fail-closed when the requested worker is missing, OFF roster or already active.
 
 0.2.2.0:
 - Restored explicit two-pane worker assignment in Management.
