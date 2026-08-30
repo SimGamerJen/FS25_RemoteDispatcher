@@ -7,19 +7,15 @@
         <text name="rd_title" text="REMOTE DISPATCHER" />
         <text name="rd_hp_unavailable" text="HelperProfiles not detected | AUTO worker selection only" />
         <text name="rd_header_vehicles" text="VEHICLES" />
-        <text name="rd_header_workers" text="WORKER ASSIGNMENT" />
         <text name="rd_col_vehicle" text="VEHICLE" />
         <text name="rd_col_auto" text="AUTO" />
         <text name="rd_col_state" text="STATE" />
         <text name="rd_col_worker" text="WORKER" />
         <text name="rd_col_task" text="TARGET / COURSE" />
-        <text name="rd_col_slot" text="SLOT" />
-        <text name="rd_detail_none" text="No compatible vehicle selected." />
-        <text name="rd_worker_auto_detail" text="Worker: AUTO" />
-        <text name="rd_status_ready" text="Ready" />
+        <text name="rd_target_none" text="No compatible vehicle selected." />
+        <text name="rd_status_cinematic" text="Close the Dispatcher, position the camera, then press Ctrl+Alt+R to start/stop the retained target." />
         <text name="rd_button_close" text="Close" />
         <text name="rd_button_automation" text="Automation" />
-        <text name="rd_button_assign" text="Assign Worker" />
-        <text name="rd_button_dispatch" text="Dispatch" />
+        <text name="rd_button_worker" text="Worker" />
     </texts>
 </l10n>
