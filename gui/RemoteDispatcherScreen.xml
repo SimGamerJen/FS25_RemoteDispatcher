@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1220px 700px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle" />
+        <ThreePartBitmap profile="fs25_dialogBgTop" />
+        <ThreePartBitmap profile="fs25_dialogBgBottom" />
+
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="dialogTitle" text="$l10n_rd_title" id="dialogTitleElement" position="0px -30px" />
+
+            <Text profile="rdMetaText" id="connectionText" position="45px -78px" size="1105px 28px" text="$l10n_rd_hp_unavailable" />
+            <ThreePartBitmap profile="fs25_lineSeparatorTopHighlighted" position="45px -112px" size="1105px 2px" />
+
+            <Text profile="rdHeaderLeft" position="45px -132px" size="675px 30px" text="$l10n_rd_header_vehicles" />
+            <GuiElement id="vehicleHeader" position="45px -165px" size="675px 38px">
+                <Text profile="rdHeaderLeft" position="8px 0px" size="195px 35px" text="$l10n_rd_col_vehicle" />
+                <Text profile="rdHeaderLeft" position="205px 0px" size="72px 35px" text="$l10n_rd_col_auto" />
+                <Text profile="rdHeaderLeft" position="280px 0px" size="90px 35px" text="$l10n_rd_col_state" />
+                <Text profile="rdHeaderLeft" position="373px 0px" size="115px 35px" text="$l10n_rd_col_worker" />
+                <Text profile="rdHeaderLeft" position="490px 0px" size="180px 35px" text="$l10n_rd_col_task" />
+            </GuiElement>
+
+            <SmoothList profile="rdList" id="vehicleTable" position="50px -205px" size="665px 300px" focusInit="onOpen" focusChangeRight="workerTable">
+                <ListItem profile="rdListItem" name="vehicleRowTemplate" size="665px 40.77px">
+                    <Text profile="rdRowCellLeft" position="8px 0px" size="192px 40.77px" name="Vehicle" textLayoutMode="scrolling" />
+                    <Text profile="rdRowCellLeft" position="205px 0px" size="68px 40.77px" name="Auto" />
+                    <Text profile="rdRowCellLeft" position="280px 0px" size="86px 40.77px" name="State" />
+                    <Text profile="rdRowCellLeft" position="373px 0px" size="110px 40.77px" name="Worker" textLayoutMode="scrolling" />
+                    <Text profile="rdRowCellLeft" position="490px 0px" size="168px 40.77px" name="Task" textLayoutMode="scrolling" />
+                </ListItem>
+            </SmoothList>
+            <ThreePartBitmap profile="fs25_listSliderBox" position="720px -205px" size="12px 300px">
+                <Slider profile="fs25_listSlider" size="6px 292px" dataElementId="vehicleTable" id="vehicleSlider" />
+            </ThreePartBitmap>
+
+            <Text profile="rdHeaderLeft" position="760px -132px" size="390px 30px" text="$l10n_rd_header_workers" />
+            <GuiElement id="workerHeader" position="760px -165px" size="390px 38px">
+                <Text profile="rdHeaderLeft" position="8px 0px" size="55px 35px" text="$l10n_rd_col_slot" />
+                <Text profile="rdHeaderLeft" position="68px 0px" size="190px 35px" text="$l10n_rd_col_worker" />
+                <Text profile="rdHeaderLeft" position="265px 0px" size="115px 35px" text="$l10n_rd_col_state" />
+            </GuiElement>
+
+            <SmoothList profile="rdList" id="workerTable" position="765px -205px" size="375px 300px" focusChangeLeft="vehicleTable">
+                <ListItem profile="rdListItem" name="workerRowTemplate" size="375px 40.77px">
+                    <Text profile="rdRowCellLeft" position="8px 0px" size="52px 40.77px" name="Slot" />
+                    <Text profile="rdRowCellLeft" position="68px 0px" size="188px 40.77px" name="Worker" textLayoutMode="scrolling" />
+                    <Text profile="rdRowCellLeft" position="265px 0px" size="105px 40.77px" name="State" />
+                </ListItem>
+            </SmoothList>
+            <ThreePartBitmap profile="fs25_listSliderBox" position="1145px -205px" size="12px 300px">
+                <Slider profile="fs25_listSlider" size="6px 292px" dataElementId="workerTable" id="workerSlider" />
+            </ThreePartBitmap>
+
+            <ThreePartBitmap profile="fs25_lineSeparatorTopHighlighted" position="45px -520px" size="1105px 2px" />
+            <GuiElement id="detailBox" position="45px -535px" size="1105px 105px">
+                <Text profile="rdMetaText" id="detailText" position="8px 5px" size="1088px 34px" text="$l10n_rd_detail_none" textLayoutMode="scrolling" />
+                <Text profile="rdMetaText" id="workerDetailText" position="8px -32px" size="1088px 30px" text="$l10n_rd_worker_auto_detail" textLayoutMode="scrolling" />
+                <Text profile="rdMetaText" id="statusText" position="8px -66px" size="1088px 30px" text="$l10n_rd_status_ready" textLayoutMode="scrolling" />
+            </GuiElement>
+        </GuiElement>
+
+        <BoxLayout profile="fs25_dialogButtonBox" size="1170px 60px">
+            <Button profile="buttonBack" text="$l10n_rd_button_close" onClick="onClickBack" />
+            <Button profile="rdButtonAction" id="providerButton" text="$l10n_rd_button_automation" onClick="onClickCycleProvider" />
+            <Button profile="rdButtonAction" id="assignButton" text="$l10n_rd_button_assign" onClick="onClickAssignWorker" />
+            <Button profile="rdButtonAction" id="dispatchButton" text="$l10n_rd_button_dispatch" onClick="onClickDispatch" />
+        </BoxLayout>
+    </GuiElement>
+</GUI>
