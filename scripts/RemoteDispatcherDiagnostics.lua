@@ -16,16 +16,18 @@ function RemoteDispatcherDiagnostics:status()
     local persistence = rawget(_G, "RemoteDispatcherPersistence")
     local selected = RemoteDispatcher:getSelectedVehicle()
 
+    local autoDriveCount = 0
+    local courseplayCount = 0
+    for _, vehicle in ipairs(RemoteDispatcher.vehicles or {}) do
+        if RemoteDispatcher:hasAutoDrive(vehicle) then autoDriveCount = autoDriveCount + 1 end
+        if RemoteDispatcher:hasCourseplay(vehicle) then courseplayCount = courseplayCount + 1 end
+    end
+
     line("version=%s vehicles=%d selected=%s", tostring(RemoteDispatcher.VERSION), #(RemoteDispatcher.vehicles or {}),
         selected ~= nil and RemoteDispatcher:getVehicleName(selected) or "none")
-    line("AutoDrive=%s CourseplayDetected=%s HelperProfiles=%s api=%s scopedHire=%s",
-        tostring(AutoDrive ~= nil),
-        tostring((function()
-            for _, vehicle in ipairs(RemoteDispatcher.vehicles or {}) do
-                if RemoteDispatcher:hasCourseplay(vehicle) then return true end
-            end
-            return false
-        end)()),
+    line("AutoDriveDetected=%s AutoDriveVehicles=%d AutoDriveGlobal=%s CourseplayDetected=%s CourseplayVehicles=%d HelperProfiles=%s api=%s scopedHire=%s",
+        tostring(autoDriveCount > 0), autoDriveCount, tostring(AutoDrive ~= nil),
+        tostring(courseplayCount > 0), courseplayCount,
         tostring(hp.available == true), tostring(hp.apiVersion or 0), tostring(hp.supportsScopedPreferredHire == true))
 
     if persistence ~= nil then
