@@ -1,4 +1,4 @@
--- FS25_RemoteDispatcher v0.2.0.0
+-- FS25_RemoteDispatcher v0.2.1.0
 -- Optional HelperProfiles API v7 integration.
 -- Vehicle -> worker assignments are owned by Remote Dispatcher. HelperProfiles
 -- remains authoritative for roster availability and supplies the requested
@@ -9,7 +9,7 @@ if RemoteDispatcher == nil then
     return
 end
 
-RemoteDispatcher.VERSION = "0.2.0.0"
+RemoteDispatcher.VERSION = "0.2.1.0"
 RemoteDispatcher.workerAssignments = RemoteDispatcher.workerAssignments or setmetatable({}, {__mode = "k"})
 RemoteDispatcher.AUTO_WORKER = "AUTO"
 
@@ -28,6 +28,17 @@ function RemoteDispatcher:getHelperProfilesAPI()
     if g_currentMission ~= nil then
         api = g_currentMission.fs25HelperProfilesAPI or g_currentMission.helperProfilesAPI
         if type(api) == "table" then return api end
+    end
+
+    -- Startup-order fallback: the integration owner may exist briefly before
+    -- its public aliases are republished.
+    local owner = rawget(_G, "HP_IntegrationAPI")
+    if type(owner) == "table" then
+        if type(owner.api) == "table" then return owner.api end
+        if type(owner.publish) == "function" and g_currentMission ~= nil then
+            pcall(owner.publish, owner, "RemoteDispatcherLookup")
+            if type(owner.api) == "table" then return owner.api end
+        end
     end
 
     return nil
@@ -215,8 +226,6 @@ function RemoteDispatcher:withAssignedWorker(vehicle, callback)
     return success, message
 end
 
--- Replace the proof-of-concept dispatcher execution with an assignment-aware
--- version. Stops do not acquire a worker; only starts enter the HProfs scope.
 function RemoteDispatcher:executeSelected()
     if #self.vehicles == 0 or self:getSelectedVehicle() == nil then
         self:refreshVehicles()
