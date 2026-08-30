@@ -2,12 +2,12 @@
 
 Remote Dispatcher remotely starts/stops prepared AutoDrive or Courseplay jobs without entering the vehicle.
 
-## v0.2.1.0 test architecture
+## v0.2.2.0 test architecture
 
-Remote Dispatcher now has two separate interfaces:
+Remote Dispatcher has two deliberately separate interfaces:
 
-- **Management GUI**: per-vehicle automation and preferred HelperProfiles worker assignment.
-- **In-game target selector**: lightweight HUD used while staging cinematics to select the retained remote target.
+- **Management GUI** — configure each vehicle's automation provider and preferred HelperProfiles worker.
+- **In-game target selector** — lightweight HUD for choosing the retained cinematic target.
 
 The management screen never starts a job and browsing it does not change the live target. Remote execution always comes from the vehicle selected in the in-game selector.
 
@@ -18,12 +18,20 @@ The management screen never starts a job and browsing it does not change the liv
 - **=** — next vehicle while the target selector is visible.
 - **-** — previous vehicle while the target selector is visible.
 - **Ctrl + Alt + R** — remotely start/stop the retained target.
+- In Management: **X** — cycle AD/CP for the highlighted vehicle.
+- In Management: **C** — assign the highlighted worker to the highlighted vehicle.
 
 The selector follows the main HUD visibility, so hiding the FS25 HUD also hides Remote Dispatcher while Ctrl+Alt+R remains available.
 
-## Management
+## Management GUI
 
-Each vehicle remembers its own automation choice (AD/CP) and HelperProfiles worker assignment. Named worker dispatch requires HelperProfiles API v7. `AUTO` preserves normal HelperProfiles/game helper selection.
+The Management screen uses separate vehicle and worker panes. Select a vehicle on the left, select `AUTO` or an enabled HelperProfiles worker on the right, then use **Assign Worker**. The current assignment is shown in the vehicle table.
+
+Each vehicle remembers its own automation choice (AD/CP) and HelperProfiles worker assignment for the session. Named worker dispatch requires HelperProfiles API v7. `AUTO` preserves normal HelperProfiles/game helper selection.
+
+## Active selector
+
+The live selector uses a compact autosizing table inspired by HelperProfiles. It measures the displayed vehicle, automation, worker, and state values rather than reserving a large fixed panel. The selected target is marked and the current AD route/CP course is shown below the table.
 
 ## Cinematic workflow
 
@@ -35,4 +43,4 @@ Each vehicle remembers its own automation choice (AD/CP) and HelperProfiles work
 6. Hide the selector/HUD if desired and position the camera.
 7. Press **Ctrl+Alt+R**.
 
-The distant-vehicle wake logic from v0.1.0.4 remains active.
+The distant-vehicle wake logic introduced in v0.1.0.4 remains active.
