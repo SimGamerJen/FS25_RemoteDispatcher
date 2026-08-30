@@ -8,16 +8,20 @@
         <text name="input_RDC_REMOTE_ACTION" text="Remote Dispatcher: Start/stop retained target" />
 
         <text name="rd_management_title" text="REMOTE DISPATCHER MANAGEMENT" />
+        <text name="rd_header_vehicles" text="VEHICLES" />
+        <text name="rd_header_workers" text="WORKER ASSIGNMENT" />
         <text name="rd_hp_unavailable" text="HelperProfiles not detected | AUTO worker selection only" />
         <text name="rd_col_vehicle" text="VEHICLE" />
         <text name="rd_col_auto" text="AUTO" />
         <text name="rd_col_state" text="STATE" />
         <text name="rd_col_worker" text="WORKER" />
         <text name="rd_col_task" text="TARGET / COURSE" />
+        <text name="rd_col_slot" text="SLOT" />
         <text name="rd_detail_none" text="No compatible vehicle selected." />
         <text name="rd_management_hint" text="Configure here; use the in-game selector to choose the cinematic target." />
         <text name="rd_button_close" text="Close" />
         <text name="rd_button_automation" text="Automation" />
         <text name="rd_button_worker" text="Worker" />
+        <text name="rd_button_assign" text="Assign Worker" />
     </texts>
 </l10n>
