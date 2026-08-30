@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.1.0.3</version>
+    <version>0.1.0.4</version>
 
     <title>
         <en>Remote Dispatcher</en>
@@ -24,16 +24,33 @@ This alpha prototype is intended for single-player testing and cinematic workflo
         <sourceFile filename="scripts/RemoteDispatcher.lua" />
         <sourceFile filename="scripts/RemoteDispatcherDiscoveryFix.lua" />
         <sourceFile filename="scripts/RemoteDispatcherUIFix.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherActivationFix.lua" />
     </extraSourceFiles>
 
     <actions>
         <action name="RDC_TOGGLE_UI" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_SELECT_PREVIOUS" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_SELECT_NEXT" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_PROVIDER_CYCLE" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_EXECUTE" category="ONFOOT" axisType="HALF" />
         <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
     </actions>
 
     <inputBinding>
         <actionBinding action="RDC_TOGGLE_UI">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
+        </actionBinding>
+        <actionBinding action="RDC_SELECT_PREVIOUS">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_minus" />
+        </actionBinding>
+        <actionBinding action="RDC_SELECT_NEXT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_equals" />
+        </actionBinding>
+        <actionBinding action="RDC_PROVIDER_CYCLE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_backslash" />
+        </actionBinding>
+        <actionBinding action="RDC_EXECUTE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_return" />
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
