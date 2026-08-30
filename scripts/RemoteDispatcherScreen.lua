@@ -81,13 +81,13 @@ function RemoteDispatcherScreen:reloadData(resetMessage)
     self.vehicleRows = RemoteDispatcher.vehicles or {}
     self.workerChoices = RemoteDispatcher:getWorkerChoices()
 
+    -- Management starts focused on the current live target but maintains its
+    -- own local row selection. Browsing/configuring here does not retarget Ctrl+Alt+R.
     self.selectedVehicleIndex = clamp(
         RemoteDispatcher.selectedIndex or self.selectedVehicleIndex,
         1,
         math.max(1, #self.vehicleRows)
     )
-    RemoteDispatcher.selectedIndex = self.selectedVehicleIndex
-    RemoteDispatcher:normalizeProvider()
 
     if resetMessage then self.actionMessage = nil end
     if self.vehicleTable ~= nil then
@@ -122,9 +122,6 @@ end
 
 function RemoteDispatcherScreen:onListSelectionChanged(list, section, index)
     self.selectedVehicleIndex = clamp(index or 1, 1, math.max(1, #self.vehicleRows))
-    RemoteDispatcher.selectedIndex = self.selectedVehicleIndex
-    RemoteDispatcher.selectionInitialized = true
-    RemoteDispatcher:normalizeProvider()
     self.actionMessage = nil
     self:updateDetails()
 end
@@ -154,11 +151,11 @@ function RemoteDispatcherScreen:updateDetails()
         or (provider == "CP" and RemoteDispatcher:getCourseplayCourseText(vehicle) or nil)
 
     safeText(self.detailText, string.format(
-        "Target: %s | %s | Worker: %s | %s",
+        "Configure: %s | %s | Worker: %s | %s",
         RemoteDispatcher:getVehicleName(vehicle), provider,
         tostring(worker.displayName or worker.slot or "AUTO"), tostring(task or "-")
     ))
-    safeText(self.statusText, self.actionMessage or "Select a row to make it the retained target. Configure Automation/Worker here, then close.")
+    safeText(self.statusText, self.actionMessage or "Management selection does not change the live target. Use the in-game selector for Ctrl+Alt+R.")
 
     if self.providerButton ~= nil then self.providerButton:setText("Automation: " .. provider) end
     if self.workerButton ~= nil then self.workerButton:setText("Worker: " .. tostring(worker.displayName or worker.slot or "AUTO")) end
@@ -169,7 +166,6 @@ function RemoteDispatcherScreen:onClickCycleProvider(sender)
     if vehicle == nil then return end
     local _, message = RemoteDispatcher:cycleProviderAssignment(vehicle, 1)
     self.actionMessage = message
-    RemoteDispatcher:normalizeProvider()
     if self.vehicleTable ~= nil then self.vehicleTable:reloadData() end
     self:updateDetails()
 end
