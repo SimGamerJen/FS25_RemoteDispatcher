@@ -16,11 +16,15 @@ The first public alpha can be published when all items below are confirmed on a 
 - [x] `rdStatus` diagnostics are available.
 - [x] CI validates XML/source references and builds the distributable ZIP.
 - [ ] Clean `log.txt` after load, management open/close, target cycling, AD start/stop, save/reload, and second dispatch.
-- [ ] Confirm persisted assignment/target restoration in-game after a full FS25 restart.
-- [ ] Confirm Courseplay remote start/stop on at least one straightforward fieldwork job.
-- [ ] Confirm AUTO worker dispatch still follows normal HelperProfiles/game selection.
-- [ ] Confirm named-worker unavailability produces a clear rejection and no substitute hire.
+- [x] Confirm persisted assignment/target restoration in-game after a full FS25 restart.
+- [x] Confirm Courseplay remote start/stop on at least one straightforward fieldwork job.
+- [x] Confirm AUTO worker dispatch still follows normal HelperProfiles/game selection.
+- [x] Confirm named-worker unavailability produces a clear rejection and no substitute hire.
 - [ ] Promote HelperProfiles API v7 into a formal compatible HProfs release, or explicitly ship the compatible API v7 test build with the alpha test package.
+
+### Validation note — 2026-08-30
+
+In-game RC testing confirmed full-restart persistence, retained target restoration, named-worker fail-closed behavior (`worker-active`), AUTO dispatch using the worker selected in HelperProfiles, and Courseplay dispatch with an RD-assigned worker.
 
 ### Alpha known limitations
 
