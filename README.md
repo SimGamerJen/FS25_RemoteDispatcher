@@ -4,20 +4,22 @@ Remote Dispatcher is a Farming Simulator 25 script mod for remotely starting and
 
 ## Current status
 
-**v0.2.0.0 — alpha / single-player test build**
+**v0.2.0.1 — alpha / single-player test build**
 
-Version 0.2 promotes the proof-of-concept overlay into a proper GIANTS GUI and adds optional **HelperProfiles API v7** worker dispatch.
+The GUI is deliberately a compact **cinematic setup panel**, not the place where the vehicle is started. Selecting a vehicle retains it as the remote target. Configure its automation/worker, close the panel, position the camera, and trigger the vehicle from the world.
 
 ## Controls
 
 - **Ctrl + Alt + D** — open Remote Dispatcher.
-- **Ctrl + Alt + R** — start/stop the retained target remotely, including after closing the Dispatcher for a cinematic.
+- **Ctrl + Alt + R** — start/stop the retained target remotely after the Dispatcher is closed.
+- In the Dispatcher: **X** cycles AutoDrive/Courseplay where both are available.
+- In the Dispatcher: **C** cycles AUTO and enabled HelperProfiles workers.
 
-All vehicle/worker navigation is handled inside the GUI, so normal menu focus consumes arrows/D-pad rather than moving the player or camera.
+Normal list navigation is handled by GIANTS GUI focus, so arrows/D-pad do not move the player or camera while the dialog is open.
 
-## Dispatcher GUI
+## Compact Dispatcher GUI
 
-The left list shows compatible owned vehicles with:
+The single vehicle list shows:
 
 - vehicle name;
 - AutoDrive/Courseplay capability;
@@ -25,24 +27,23 @@ The left list shows compatible owned vehicles with:
 - assigned worker;
 - current AD destination or CP course.
 
-The right list shows **AUTO** plus enabled HelperProfiles workers when API v7 is available.
+Selecting a row immediately makes that vehicle the retained cinematic target. The only configuration buttons are **Automation** and **Worker**. There is intentionally no Dispatch button.
 
-Buttons provide:
+The intended workflow is:
 
-- automation selection (AD/CP);
-- worker assignment;
-- dispatch/stop;
-- close.
+1. Prepare the AD destination/mode or CP job normally.
+2. Open Remote Dispatcher.
+3. Select the vehicle.
+4. Optionally choose AD/CP and assign AUTO or a named HelperProfiles worker.
+5. Close Remote Dispatcher.
+6. Position the player/camera for the shot.
+7. Press **Ctrl + Alt + R**.
 
 ## HelperProfiles integration
 
-`AUTO` keeps normal HelperProfiles/game helper selection.
+`AUTO` keeps normal HelperProfiles/game helper selection. A named assignment uses HelperProfiles API v7 `beginPreferredHire()` / `endPreferredHire()` around the synchronous AutoDrive/Courseplay start. The scoped request is fail-closed: if the assigned worker is active, off roster, or unavailable, dispatch fails rather than silently substituting another worker.
 
-A named assignment such as `MT635 -> Rhys` uses HelperProfiles API v7 `beginPreferredHire()` / `endPreferredHire()` around the synchronous AutoDrive/Courseplay start. The scoped request is fail-closed: if Rhys is active, off roster, or unavailable, the dispatch fails rather than silently substituting another worker.
-
-The normal HelperProfiles selected worker is not changed.
-
-Worker assignments are runtime/session state in this first GUI build; save persistence can be added after the interaction is proven.
+The normal HelperProfiles selected worker is not changed. Worker assignments are runtime/session state in this test build.
 
 ## Remote vehicle activation
 
