@@ -1,0 +1,115 @@
+name: Release Remote Dispatcher 0.3.0.0-alpha.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-0.3.0.0-alpha.1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate alpha release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          root = Path('.')
+          xml_files = [
+              root / 'modDesc.xml',
+              root / 'gui' / 'RemoteDispatcherScreen.xml',
+              root / 'gui' / 'guiProfiles.xml',
+              root / 'translations' / 'l10n_en.xml',
+          ]
+          for path in xml_files:
+              ET.parse(path)
+              print(f'XML OK: {path}')
+
+          mod = ET.parse(root / 'modDesc.xml').getroot()
+          if mod.findtext('version') != '0.3.0.0':
+              raise SystemExit(f"Unexpected mod version: {mod.findtext('version')}")
+
+          missing = []
+          for elem in mod.findall('./extraSourceFiles/sourceFile'):
+              filename = elem.attrib.get('filename')
+              if filename and not (root / filename).is_file():
+                  missing.append(filename)
+          if missing:
+              raise SystemExit(f'Missing sourceFile entries: {missing}')
+
+          readme = (root / 'README.md').read_text(encoding='utf-8')
+          notes = (root / 'docs/releases/0.3.0.0-alpha.md').read_text(encoding='utf-8')
+          for text, label in ((readme, 'README'), (notes, 'release notes')):
+              if 'HelperProfiles 2.1.1.0' not in text:
+                  raise SystemExit(f'{label} does not declare HelperProfiles 2.1.1.0')
+          PY
+
+      - name: Build FS25 mod ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f FS25_RemoteDispatcher.zip
+          zip -r FS25_RemoteDispatcher.zip \
+            modDesc.xml README.md gui scripts translations docs \
+            -x '*.DS_Store' '*__MACOSX*' '.git*'
+
+          python - <<'PY'
+          import zipfile
+          import xml.etree.ElementTree as ET
+
+          package = 'FS25_RemoteDispatcher.zip'
+          with zipfile.ZipFile(package, 'r') as archive:
+              required = {
+                  'modDesc.xml',
+                  'scripts/RemoteDispatcher.lua',
+                  'scripts/RemoteDispatcherHelperProfiles.lua',
+                  'scripts/RemoteDispatcherPersistence.lua',
+                  'scripts/RemoteDispatcherDiagnostics.lua',
+                  'gui/RemoteDispatcherScreen.xml',
+                  'translations/l10n_en.xml',
+              }
+              missing = sorted(required - set(archive.namelist()))
+              if missing:
+                  raise SystemExit(f'Missing package files: {missing}')
+              bad = archive.testzip()
+              if bad:
+                  raise SystemExit(f'Corrupt ZIP member: {bad}')
+              root = ET.fromstring(archive.read('modDesc.xml'))
+              if root.findtext('version') != '0.3.0.0':
+                  raise SystemExit('Packaged modDesc has unexpected version')
+          PY
+
+      - name: Publish GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='0.3.0.0-alpha.1'
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; replacing ZIP asset and release notes."
+            gh release upload "$TAG" FS25_RemoteDispatcher.zip --clobber
+            gh release edit "$TAG" \
+              --title 'Remote Dispatcher 0.3.0.0-alpha.1' \
+              --notes-file docs/releases/0.3.0.0-alpha.md \
+              --prerelease
+          else
+            gh release create "$TAG" \
+              FS25_RemoteDispatcher.zip \
+              --target main \
+              --title 'Remote Dispatcher 0.3.0.0-alpha.1' \
+              --notes-file docs/releases/0.3.0.0-alpha.md \
+              --prerelease
+          fi
