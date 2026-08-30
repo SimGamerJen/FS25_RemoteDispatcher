@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
-    <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.2.2.0</version>
+    <author>SimGamerJen</author>
+    <version>0.3.0.0</version>
 
     <title><en>Remote Dispatcher</en></title>
     <description><en><![CDATA[
 Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the vehicle.
 
-The mod has two interfaces: a management GUI for per-vehicle automation/worker setup, and a lightweight in-game selector for choosing the retained cinematic target. Ctrl+Alt+R remotely starts/stops the target selected in the in-game selector.
+Use the management screen to configure each vehicle's automation provider and optional HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained cinematic target, position the camera, then press Ctrl+Alt+R to start or stop that vehicle remotely.
 
-Single-player alpha intended for testing and cinematic workflows.
+Version 0.3.0.0 adds per-save persistence for automation/worker assignments and the retained target. HelperProfiles remains optional; named worker assignment requires HelperProfiles API v7 (HelperProfiles 2.1.1.0 or newer).
+
+Early alpha. Single-player only.
     ]]></en></description>
+
+    <changelog><en><![CDATA[
+0.3.0.0:
+- Added per-save persistence keyed to FS25 vehicle unique IDs.
+- Automation provider and HelperProfiles worker assignments now survive save reloads.
+- The retained cinematic target is restored when the save is reopened.
+- Added rdStatus support diagnostics for alpha testing.
+- Retained the two-pane management GUI and measured in-game target selector from 0.2.2.0.
+- Named worker assignment requires HelperProfiles API v7; HelperProfiles remains optional.
+
+0.2.2.0:
+- Restored explicit two-pane worker assignment in Management.
+- Reworked the live selector with measured columns and dynamic sizing.
+- Kept Management configuration separate from the live cinematic target.
+    ]]></en></changelog>
 
     <multiplayer supported="false" />
     <l10n filenamePrefix="translations/l10n" defaultLanguage="en" />
@@ -24,6 +41,8 @@ Single-player alpha intended for testing and cinematic workflows.
         <sourceFile filename="scripts/RemoteDispatcherState.lua" />
         <sourceFile filename="scripts/RemoteDispatcherScreen.lua" />
         <sourceFile filename="scripts/RemoteDispatcherSelector.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherPersistence.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherDiagnostics.lua" />
     </extraSourceFiles>
 
     <actions>
