@@ -20,11 +20,13 @@ The first public alpha can be published when all items below are confirmed on a 
 - [x] Confirm Courseplay remote start/stop on at least one straightforward fieldwork job.
 - [x] Confirm AUTO worker dispatch still follows normal HelperProfiles/game selection.
 - [x] Confirm named-worker unavailability produces a clear rejection and no substitute hire.
-- [ ] Promote HelperProfiles API v7 into a formal compatible HProfs release, or explicitly ship the compatible API v7 test build with the alpha test package.
+- [x] HelperProfiles API v7 is formally available in the stable HelperProfiles 2.1.1.0 release.
 
 ### Validation note — 2026-08-30
 
 In-game RC testing confirmed full-restart persistence, retained target restoration, named-worker fail-closed behavior (`worker-active`), AUTO dispatch using the worker selected in HelperProfiles, and Courseplay dispatch with an RD-assigned worker. The accompanying `log.txt` contains no Remote Dispatcher Lua errors, stack traces, failed persistence operations, or HelperProfiles scoped-hire failures. Unrelated warnings/errors from other installed test mods are outside the Remote Dispatcher alpha gate.
+
+HelperProfiles 2.1.1.0 now publishes Integration API v7 as part of the stable release line. The same stable API v7 and management-rendering fixes have also been forward-ported into the active World Workers HelperProfiles development branch so the development line does not regress to API v6.
 
 ### Alpha known limitations
 
