@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.2.1.0</version>
+    <version>0.2.2.0</version>
 
     <title><en>Remote Dispatcher</en></title>
     <description><en><![CDATA[
@@ -32,6 +32,8 @@ Single-player alpha intended for testing and cinematic workflows.
         <action name="RDC_CYCLE_TARGET" category="ONFOOT" axisType="HALF" />
         <action name="RDC_CYCLE_TARGET_PREVIOUS" category="ONFOOT" axisType="HALF" />
         <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_GUI_PROVIDER" category="MENU" axisType="HALF" />
+        <action name="RDC_GUI_ASSIGN" category="MENU" axisType="HALF" />
     </actions>
 
     <inputBinding>
@@ -49,6 +51,12 @@ Single-player alpha intended for testing and cinematic workflows.
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
+        </actionBinding>
+        <actionBinding action="RDC_GUI_PROVIDER">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_x" />
+        </actionBinding>
+        <actionBinding action="RDC_GUI_ASSIGN">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_c" />
         </actionBinding>
     </inputBinding>
 </modDesc>
