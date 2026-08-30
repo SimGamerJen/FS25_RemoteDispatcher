@@ -2,6 +2,10 @@
 <l10n>
     <texts>
         <text name="input_RDC_TOGGLE_UI" text="Remote Dispatcher: Open/close" />
+        <text name="input_RDC_SELECT_PREVIOUS" text="Remote Dispatcher: Previous vehicle" />
+        <text name="input_RDC_SELECT_NEXT" text="Remote Dispatcher: Next vehicle" />
+        <text name="input_RDC_PROVIDER_CYCLE" text="Remote Dispatcher: Switch AutoDrive/Courseplay" />
+        <text name="input_RDC_EXECUTE" text="Remote Dispatcher: Start/stop highlighted vehicle" />
         <text name="input_RDC_REMOTE_ACTION" text="Remote Dispatcher: Start/stop selected vehicle" />
     </texts>
 </l10n>
