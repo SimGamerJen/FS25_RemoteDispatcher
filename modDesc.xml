@@ -9,7 +9,7 @@ Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Cours
 
 Use the management screen to configure each vehicle's automation provider and optional HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained cinematic target, position the camera, then press Ctrl+Alt+R to start or stop that vehicle remotely.
 
-Version 0.3.0.0 adds per-save persistence for automation/worker assignments and the retained target. HelperProfiles remains optional; named worker assignment requires HelperProfiles API v7 (HelperProfiles 2.1.1.0 or newer).
+Version 0.3.0.0 adds per-save persistence for automation/worker assignments and the retained target. HelperProfiles remains optional; named worker assignment requires a compatible HelperProfiles build publishing API v7.
 
 Early alpha. Single-player only.
     ]]></en></description>
