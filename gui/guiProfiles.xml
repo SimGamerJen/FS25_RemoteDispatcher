@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUIProfiles>
+    <Profile name="rdHeaderLeft" extends="baseReference" with="anchorTopLeft pivotTopLeft">
+        <imageColor value="0 0 0 0" />
+        <textFocusedColor value="$preset_fs25_colorMainHighlight" />
+        <textHighlightedColor value="$preset_fs25_colorMainHighlight" />
+        <textSize value="16px" />
+        <textBold value="true" />
+        <textUpperCase value="true" />
+        <textColor value="$preset_colorWhite_50" />
+        <textAlignment value="left" />
+        <textDisabledColor value="$preset_colorDisabled" />
+    </Profile>
+
+    <Profile name="rdList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft" />
+
+    <Profile name="rdListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+        <height value="40px" />
+        <imageColor value="$preset_fs25_colorGrey" />
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight" />
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
+    </Profile>
+
+    <Profile name="rdRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false" />
+        <textSize value="15px" />
+        <textAlignment value="left" />
+        <textColor value="$preset_fs25_colorMainLight" />
+        <textSelectedColor value="$preset_fs25_colorMainDark" />
+        <textDisabledColor value="$preset_colorDisabled" />
+    </Profile>
+
+    <Profile name="rdMetaText" extends="baseReference" with="anchorTopLeft pivotTopLeft">
+        <imageColor value="0 0 0 0" />
+        <textSize value="15px" />
+        <textColor value="$preset_fs25_colorMainLight" />
+        <textDisabledColor value="$preset_colorDisabled" />
+        <textAlignment value="left" />
+    </Profile>
+
+    <Profile name="rdButtonAction" extends="buttonExtra1" />
+</GUIProfiles>
