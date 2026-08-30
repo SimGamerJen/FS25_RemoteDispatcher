@@ -1,0 +1,84 @@
+name: Validate Remote Dispatcher Alpha
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate XML and mod source references
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          root = Path('.')
+          xml_files = [
+              root / 'modDesc.xml',
+              root / 'gui' / 'RemoteDispatcherScreen.xml',
+              root / 'gui' / 'guiProfiles.xml',
+              root / 'translations' / 'l10n_en.xml',
+          ]
+          for path in xml_files:
+              ET.parse(path)
+              print(f'XML OK: {path}')
+
+          mod = ET.parse(root / 'modDesc.xml').getroot()
+          missing = []
+          for elem in mod.findall('./extraSourceFiles/sourceFile'):
+              filename = elem.attrib.get('filename')
+              if filename and not (root / filename).is_file():
+                  missing.append(filename)
+          if missing:
+              raise SystemExit(f'Missing sourceFile entries: {missing}')
+
+          version = mod.findtext('version')
+          if version != '0.3.0.0':
+              raise SystemExit(f'Unexpected version: {version}')
+          PY
+
+      - name: Build FS25 mod ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f FS25_RemoteDispatcher.zip
+          zip -r FS25_RemoteDispatcher.zip \
+            modDesc.xml README.md gui scripts translations docs \
+            -x '*.DS_Store' '*__MACOSX*' '.git*'
+
+          python - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('FS25_RemoteDispatcher.zip') as z:
+              required = {
+                  'modDesc.xml',
+                  'scripts/RemoteDispatcher.lua',
+                  'scripts/RemoteDispatcherPersistence.lua',
+                  'scripts/RemoteDispatcherDiagnostics.lua',
+                  'gui/RemoteDispatcherScreen.xml',
+              }
+              missing = required - set(z.namelist())
+              if missing:
+                  raise SystemExit(f'Missing package files: {sorted(missing)}')
+              bad = z.testzip()
+              if bad:
+                  raise SystemExit(f'Corrupt ZIP member: {bad}')
+          PY
+
+      - name: Upload alpha validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FS25_RemoteDispatcher_0.3.0.0-alpha
+          path: FS25_RemoteDispatcher.zip
+          retention-days: 14
