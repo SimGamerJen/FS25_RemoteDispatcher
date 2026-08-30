@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen / ChatGPT prototype</author>
-    <version>0.1.0.4</version>
+    <version>0.2.0.0</version>
 
     <title>
         <en>Remote Dispatcher</en>
@@ -9,11 +9,11 @@
 
     <description>
         <en><![CDATA[
-Proof-of-concept remote dispatcher for AutoDrive and Courseplay.
+Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the vehicle.
 
-Prepare a vehicle's AutoDrive destination/mode or Courseplay job normally, leave the vehicle, select it in the dispatcher overlay, then start or stop that automation remotely.
+Version 0.2 introduces a proper dispatcher GUI and optional HelperProfiles API v7 integration. Vehicles can be assigned a specific enabled worker or left on AUTO. Named assignments are enforced only for the scoped hire triggered by that dispatch and do not change the normal HelperProfiles selection.
 
-This alpha prototype is intended for single-player testing and cinematic workflows.
+Single-player alpha intended for testing and cinematic workflows.
         ]]></en>
     </description>
 
@@ -25,32 +25,18 @@ This alpha prototype is intended for single-player testing and cinematic workflo
         <sourceFile filename="scripts/RemoteDispatcherDiscoveryFix.lua" />
         <sourceFile filename="scripts/RemoteDispatcherUIFix.lua" />
         <sourceFile filename="scripts/RemoteDispatcherActivationFix.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherHelperProfiles.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherScreen.lua" />
     </extraSourceFiles>
 
     <actions>
         <action name="RDC_TOGGLE_UI" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_SELECT_PREVIOUS" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_SELECT_NEXT" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_PROVIDER_CYCLE" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_EXECUTE" category="ONFOOT" axisType="HALF" />
         <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
     </actions>
 
     <inputBinding>
         <actionBinding action="RDC_TOGGLE_UI">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
-        </actionBinding>
-        <actionBinding action="RDC_SELECT_PREVIOUS">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_minus" />
-        </actionBinding>
-        <actionBinding action="RDC_SELECT_NEXT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_equals" />
-        </actionBinding>
-        <actionBinding action="RDC_PROVIDER_CYCLE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_backslash" />
-        </actionBinding>
-        <actionBinding action="RDC_EXECUTE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_return" />
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
