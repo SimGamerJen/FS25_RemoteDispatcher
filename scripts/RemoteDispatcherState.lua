@@ -73,6 +73,22 @@ function RemoteDispatcher:normalizeProvider()
     self.selectedProvider = self:getProviderAssignment(vehicle)
 end
 
+-- Target cycling is a backend operation. The selector callbacks decide when it
+-- is permitted, so it must not depend on the legacy overlay's isOpen flag.
+function RemoteDispatcher:selectRelative(delta)
+    self.selectionInitialized = true
+    if self.vehicles == nil or #self.vehicles == 0 then
+        self:refreshVehicles()
+        if #self.vehicles == 0 then return false end
+    end
+
+    self.selectedIndex = (self.selectedIndex or 1) + (delta or 1)
+    if self.selectedIndex < 1 then self.selectedIndex = #self.vehicles end
+    if self.selectedIndex > #self.vehicles then self.selectedIndex = 1 end
+    self:normalizeProvider()
+    return true
+end
+
 local previousDeleteMap = RemoteDispatcher.deleteMap
 function RemoteDispatcher:deleteMap()
     self.providerAssignments = setmetatable({}, {__mode = "k"})
