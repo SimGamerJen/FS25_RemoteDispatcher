@@ -1,12 +1,13 @@
--- FS25_RemoteDispatcher v0.2.1.0
--- Management GUI: configure automation and preferred worker; no dispatch action here.
+-- FS25_RemoteDispatcher v0.2.2.0
+-- Management GUI: configure per-vehicle automation and preferred worker.
+-- Live Ctrl+Alt+R targeting remains owned by the in-game selector.
 
 if RemoteDispatcher == nil then
     Logging.error("[RemoteDispatcher] Management screen loaded before RemoteDispatcher.lua")
     return
 end
 
-RemoteDispatcher.VERSION = "0.2.1.0"
+RemoteDispatcher.VERSION = "0.2.2.0"
 
 local MOD_DIR = g_currentModDirectory or ""
 local LOG = "[RemoteDispatcher/Management] "
@@ -23,14 +24,39 @@ local function safeText(element, text)
     if element ~= nil and element.setText ~= nil then element:setText(tostring(text or "")) end
 end
 
+local VehicleDataSource = {}
+VehicleDataSource.__index = VehicleDataSource
+function VehicleDataSource.new(screen)
+    return setmetatable({screen = screen}, VehicleDataSource)
+end
+function VehicleDataSource:getNumberOfSections() return 1 end
+function VehicleDataSource:getNumberOfItemsInSection() return #(self.screen.vehicleRows or {}) end
+function VehicleDataSource:populateCellForItemInSection(list, section, index, cell)
+    self.screen:populateVehicleCell(index, cell)
+end
+
+local WorkerDataSource = {}
+WorkerDataSource.__index = WorkerDataSource
+function WorkerDataSource.new(screen)
+    return setmetatable({screen = screen}, WorkerDataSource)
+end
+function WorkerDataSource:getNumberOfSections() return 1 end
+function WorkerDataSource:getNumberOfItemsInSection() return #(self.screen.workerRows or {}) end
+function WorkerDataSource:populateCellForItemInSection(list, section, index, cell)
+    self.screen:populateWorkerCell(index, cell)
+end
+
 RemoteDispatcherScreen = {}
 local RemoteDispatcherScreen_mt = Class(RemoteDispatcherScreen, MessageDialog)
 
 function RemoteDispatcherScreen.new(target, customMt)
     local self = MessageDialog.new(target, customMt or RemoteDispatcherScreen_mt)
     self.vehicleRows = {}
+    self.workerRows = {}
     self.selectedVehicleIndex = 1
-    self.workerChoices = {}
+    self.selectedWorkerIndex = 1
+    self.vehicleDataSource = VehicleDataSource.new(self)
+    self.workerDataSource = WorkerDataSource.new(self)
     self.actionMessage = nil
     self.retryTimer = 0
     return self
@@ -39,8 +65,12 @@ end
 function RemoteDispatcherScreen:onGuiSetupFinished()
     RemoteDispatcherScreen:superClass().onGuiSetupFinished(self)
     if self.vehicleTable ~= nil then
-        self.vehicleTable:setDataSource(self)
+        self.vehicleTable:setDataSource(self.vehicleDataSource)
         self.vehicleTable:setDelegate(self)
+    end
+    if self.workerTable ~= nil then
+        self.workerTable:setDataSource(self.workerDataSource)
+        self.workerTable:setDelegate(self)
     end
 end
 
@@ -66,12 +96,17 @@ end
 
 function RemoteDispatcherScreen:update(dt)
     RemoteDispatcherScreen:superClass().update(self, dt)
-    -- Retry briefly if another script mod published its vehicle/API state later in the frame.
-    if #self.vehicleRows == 0 or RemoteDispatcher:getHelperProfilesStatus().available ~= true then
-        self.retryTimer = (self.retryTimer or 0) + (dt or 0)
-        if self.retryTimer >= 750 then
-            self.retryTimer = 0
+    self.retryTimer = (self.retryTimer or 0) + (dt or 0)
+    if self.retryTimer >= 750 then
+        self.retryTimer = 0
+        local hadVehicles = #self.vehicleRows > 0
+        local hpWasAvailable = RemoteDispatcher:getHelperProfilesStatus().available == true
+        if not hadVehicles or not hpWasAvailable then
             self:reloadData(false)
+        else
+            self.workerRows = RemoteDispatcher:getWorkerChoices()
+            if self.workerTable ~= nil then self.workerTable:reloadData() end
+            self:updateDetails()
         end
     end
 end
@@ -79,21 +114,28 @@ end
 function RemoteDispatcherScreen:reloadData(resetMessage)
     RemoteDispatcher:refreshVehicles()
     self.vehicleRows = RemoteDispatcher.vehicles or {}
-    self.workerChoices = RemoteDispatcher:getWorkerChoices()
+    self.workerRows = RemoteDispatcher:getWorkerChoices()
 
-    -- Management starts focused on the current live target but maintains its
-    -- own local row selection. Browsing/configuring here does not retarget Ctrl+Alt+R.
     self.selectedVehicleIndex = clamp(
         RemoteDispatcher.selectedIndex or self.selectedVehicleIndex,
         1,
         math.max(1, #self.vehicleRows)
     )
+    self.selectedWorkerIndex = clamp(self.selectedWorkerIndex, 1, math.max(1, #self.workerRows))
+    self:selectAssignedWorkerRow()
 
     if resetMessage then self.actionMessage = nil end
+
     if self.vehicleTable ~= nil then
         self.vehicleTable:reloadData()
         if self.vehicleTable.setSelectedIndex ~= nil then
             pcall(function() self.vehicleTable:setSelectedIndex(self.selectedVehicleIndex) end)
+        end
+    end
+    if self.workerTable ~= nil then
+        self.workerTable:reloadData()
+        if self.workerTable.setSelectedIndex ~= nil then
+            pcall(function() self.workerTable:setSelectedIndex(self.selectedWorkerIndex) end)
         end
     end
     self:updateDetails()
@@ -103,25 +145,70 @@ function RemoteDispatcherScreen:getSelectedVehicle()
     return self.vehicleRows[self.selectedVehicleIndex]
 end
 
-function RemoteDispatcherScreen:getNumberOfSections() return 1 end
-function RemoteDispatcherScreen:getNumberOfItemsInSection() return #(self.vehicleRows or {}) end
+function RemoteDispatcherScreen:getSelectedWorkerRow()
+    return self.workerRows[self.selectedWorkerIndex]
+end
 
-function RemoteDispatcherScreen:populateCellForItemInSection(list, section, index, cell)
+function RemoteDispatcherScreen:selectAssignedWorkerRow()
+    local vehicle = self:getSelectedVehicle()
+    local assignment = tostring(RemoteDispatcher:getWorkerAssignment(vehicle) or RemoteDispatcher.AUTO_WORKER or "AUTO")
+    for index, row in ipairs(self.workerRows or {}) do
+        if tostring(row.slot) == assignment then
+            self.selectedWorkerIndex = index
+            return
+        end
+    end
+    self.selectedWorkerIndex = 1
+end
+
+function RemoteDispatcherScreen:getProviderDetail(vehicle, provider)
+    if provider == "AD" then
+        return RemoteDispatcher:getAutoDriveDestinationText(vehicle) or "-"
+    elseif provider == "CP" then
+        return RemoteDispatcher:getCourseplayCourseText(vehicle) or "-"
+    end
+    return "-"
+end
+
+function RemoteDispatcherScreen:populateVehicleCell(index, cell)
     local vehicle = self.vehicleRows[index]
     if vehicle == nil or cell == nil then return end
+
     local provider = RemoteDispatcher:getProviderAssignment(vehicle) or "-"
     local worker = RemoteDispatcher:getWorkerAssignmentData(vehicle)
     cell:getAttribute("Vehicle"):setText(RemoteDispatcher:getVehicleName(vehicle))
     cell:getAttribute("Auto"):setText(provider)
     cell:getAttribute("State"):setText(RemoteDispatcher:getProviderStatus(vehicle, provider))
     cell:getAttribute("Worker"):setText(tostring(worker.displayName or worker.slot or "AUTO"))
-    local task = provider == "AD" and RemoteDispatcher:getAutoDriveDestinationText(vehicle)
-        or (provider == "CP" and RemoteDispatcher:getCourseplayCourseText(vehicle) or nil)
-    cell:getAttribute("Task"):setText(tostring(task or "-"))
+    cell:getAttribute("Task"):setText(self:getProviderDetail(vehicle, provider))
+end
+
+function RemoteDispatcherScreen:populateWorkerCell(index, cell)
+    local row = self.workerRows[index]
+    if row == nil or cell == nil then return end
+
+    local slotText = row.automatic and "-" or tostring(row.slot or "-")
+    local state = row.automatic and "NORMAL" or (row.inUse and "ACTIVE" or "AVAILABLE")
+    cell:getAttribute("Slot"):setText(slotText)
+    cell:getAttribute("Worker"):setText(tostring(row.displayName or row.slot or "AUTO"))
+    cell:getAttribute("State"):setText(state)
 end
 
 function RemoteDispatcherScreen:onListSelectionChanged(list, section, index)
-    self.selectedVehicleIndex = clamp(index or 1, 1, math.max(1, #self.vehicleRows))
+    if list == self.vehicleTable then
+        self.selectedVehicleIndex = clamp(index or 1, 1, math.max(1, #self.vehicleRows))
+        self.workerRows = RemoteDispatcher:getWorkerChoices()
+        self:selectAssignedWorkerRow()
+        if self.workerTable ~= nil then
+            self.workerTable:reloadData()
+            if self.workerTable.setSelectedIndex ~= nil then
+                pcall(function() self.workerTable:setSelectedIndex(self.selectedWorkerIndex) end)
+            end
+        end
+    elseif list == self.workerTable then
+        self.selectedWorkerIndex = clamp(index or 1, 1, math.max(1, #self.workerRows))
+    end
+
     self.actionMessage = nil
     self:updateDetails()
 end
@@ -129,9 +216,15 @@ end
 function RemoteDispatcherScreen:updateDetails()
     local hp = RemoteDispatcher:getHelperProfilesStatus()
     if hp.available and hp.supportsScopedPreferredHire then
-        safeText(self.connectionText, string.format("HelperProfiles API v%d connected | Named worker assignments available", hp.apiVersion or 0))
+        safeText(self.connectionText, string.format(
+            "HelperProfiles API v%d connected | Named worker assignments available",
+            hp.apiVersion or 0
+        ))
     elseif hp.available then
-        safeText(self.connectionText, string.format("HelperProfiles API v%d connected | API v7 required for named dispatch", hp.apiVersion or 0))
+        safeText(self.connectionText, string.format(
+            "HelperProfiles API v%d connected | API v7 required for named dispatch",
+            hp.apiVersion or 0
+        ))
     else
         safeText(self.connectionText, "HelperProfiles not detected | AUTO worker selection only")
     end
@@ -139,53 +232,50 @@ function RemoteDispatcherScreen:updateDetails()
     local vehicle = self:getSelectedVehicle()
     if vehicle == nil then
         safeText(self.detailText, "No compatible vehicle selected. Retrying discovery...")
-        safeText(self.statusText, self.actionMessage or "Management configures vehicles; use the in-game selector for cinematic targeting.")
+        safeText(self.statusText, self.actionMessage or "Management configures vehicles; the live selector owns the cinematic target.")
         if self.providerButton ~= nil then self.providerButton:setText("Automation") end
-        if self.workerButton ~= nil then self.workerButton:setText("Worker: AUTO") end
+        if self.assignButton ~= nil then self.assignButton:setText("Assign Worker") end
         return
     end
 
     local provider = RemoteDispatcher:getProviderAssignment(vehicle) or "-"
-    local worker = RemoteDispatcher:getWorkerAssignmentData(vehicle)
-    local task = provider == "AD" and RemoteDispatcher:getAutoDriveDestinationText(vehicle)
-        or (provider == "CP" and RemoteDispatcher:getCourseplayCourseText(vehicle) or nil)
+    local assigned = RemoteDispatcher:getWorkerAssignmentData(vehicle)
+    local task = self:getProviderDetail(vehicle, provider)
+    local selectedWorker = self:getSelectedWorkerRow()
 
     safeText(self.detailText, string.format(
-        "Configure: %s | %s | Worker: %s | %s",
+        "%s | %s | Assigned: %s | %s",
         RemoteDispatcher:getVehicleName(vehicle), provider,
-        tostring(worker.displayName or worker.slot or "AUTO"), tostring(task or "-")
+        tostring(assigned.displayName or assigned.slot or "AUTO"), tostring(task or "-")
     ))
-    safeText(self.statusText, self.actionMessage or "Management selection does not change the live target. Use the in-game selector for Ctrl+Alt+R.")
+    safeText(self.statusText, self.actionMessage or "Choose a worker on the right and Assign. Management does not change the live target.")
 
-    if self.providerButton ~= nil then self.providerButton:setText("Automation: " .. provider) end
-    if self.workerButton ~= nil then self.workerButton:setText("Worker: " .. tostring(worker.displayName or worker.slot or "AUTO")) end
+    if self.providerButton ~= nil then
+        self.providerButton:setText("Automation: " .. tostring(provider))
+    end
+    if self.assignButton ~= nil then
+        self.assignButton:setText("Assign: " .. tostring(selectedWorker ~= nil and selectedWorker.displayName or "AUTO"))
+    end
 end
 
 function RemoteDispatcherScreen:onClickCycleProvider(sender)
     local vehicle = self:getSelectedVehicle()
     if vehicle == nil then return end
+
     local _, message = RemoteDispatcher:cycleProviderAssignment(vehicle, 1)
-    self.actionMessage = message
+    self.actionMessage = tostring(message)
     if self.vehicleTable ~= nil then self.vehicleTable:reloadData() end
     self:updateDetails()
 end
 
-function RemoteDispatcherScreen:onClickCycleWorker(sender)
+function RemoteDispatcherScreen:onClickAssignWorker(sender)
     local vehicle = self:getSelectedVehicle()
-    if vehicle == nil then return end
+    local worker = self:getSelectedWorkerRow()
+    if vehicle == nil or worker == nil then return end
 
-    self.workerChoices = RemoteDispatcher:getWorkerChoices()
-    local current = RemoteDispatcher:getWorkerAssignment(vehicle)
-    local currentIndex = 1
-    for index, row in ipairs(self.workerChoices) do
-        if tostring(row.slot) == tostring(current) then currentIndex = index break end
-    end
-
-    local nextIndex = (currentIndex % math.max(1, #self.workerChoices)) + 1
-    local nextRow = self.workerChoices[nextIndex]
-    local success, message = RemoteDispatcher:setWorkerAssignment(vehicle, nextRow ~= nil and nextRow.slot or "AUTO")
-    self.actionMessage = tostring(message)
-    if success and self.vehicleTable ~= nil then self.vehicleTable:reloadData() end
+    local success, message = RemoteDispatcher:setWorkerAssignment(vehicle, worker.slot)
+    self.actionMessage = tostring(message or (success and "Worker assigned" or "Worker assignment failed"))
+    if self.vehicleTable ~= nil then self.vehicleTable:reloadData() end
     self:updateDetails()
 end
 
@@ -213,6 +303,7 @@ end
 function RemoteDispatcherGui:loadDialog()
     if self.loaded or self.failed then return self.loaded end
     if g_gui == nil then return false end
+
     local modDir = self.modDirectory or MOD_DIR or g_currentModDirectory or ""
     local ok, err = pcall(function()
         if g_gui.loadProfiles ~= nil then g_gui:loadProfiles(modDir .. "gui/guiProfiles.xml") end
@@ -236,4 +327,4 @@ function RemoteDispatcherGui:open()
 end
 
 addModEventListener(RemoteDispatcherGui)
-rdPrint("v" .. tostring(RemoteDispatcher.VERSION) .. " management GUI active")
+rdPrint("v" .. tostring(RemoteDispatcher.VERSION) .. " two-pane management GUI active")
