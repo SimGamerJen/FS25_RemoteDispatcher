@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <GUIProfiles>
+    <Profile name="rdSectionTitle" extends="baseReference" with="anchorTopLeft pivotTopLeft">
+        <imageColor value="0 0 0 0" />
+        <textSize value="17px" />
+        <textBold value="true" />
+        <textUpperCase value="true" />
+        <textColor value="$preset_fs25_colorMainLight" />
+        <textAlignment value="left" />
+    </Profile>
+
     <Profile name="rdHeaderLeft" extends="baseReference" with="anchorTopLeft pivotTopLeft">
         <imageColor value="0 0 0 0" />
         <textFocusedColor value="$preset_fs25_colorMainHighlight" />
         <textHighlightedColor value="$preset_fs25_colorMainHighlight" />
-        <textSize value="16px" />
+        <textSize value="15px" />
         <textBold value="true" />
         <textUpperCase value="true" />
         <textColor value="$preset_colorWhite_50" />
@@ -38,5 +47,11 @@
         <textAlignment value="left" />
     </Profile>
 
-    <Profile name="rdButtonAction" extends="buttonExtra1" />
+    <Profile name="rdButtonProvider" extends="buttonExtra1">
+        <inputAction value="RDC_GUI_PROVIDER" />
+    </Profile>
+
+    <Profile name="rdButtonAssign" extends="buttonExtra1">
+        <inputAction value="RDC_GUI_ASSIGN" />
+    </Profile>
 </GUIProfiles>
