@@ -4,36 +4,48 @@ Remote Dispatcher is a Farming Simulator 25 script mod for remotely starting and
 
 ## Current status
 
-**v0.1.0.4 — alpha / single-player test build**
+**v0.2.0.0 — alpha / single-player test build**
 
-The target vehicle is persistent: once selected, player distance does not affect remote dispatch. Proximity is used only for the initial target when no selection has yet been made.
+Version 0.2 promotes the proof-of-concept overlay into a proper GIANTS GUI and adds optional **HelperProfiles API v7** worker dispatch.
 
 ## Controls
 
-- **Ctrl + Alt + D** — open/close Remote Dispatcher.
-- **- / =** — previous/next compatible vehicle while the Dispatcher is open.
-- **\** — switch AutoDrive/Courseplay for the selected vehicle.
-- **Enter** — start/stop the selected vehicle while the Dispatcher is open.
-- **Ctrl + Alt + R** — start/stop the retained target from anywhere, including with the Dispatcher closed.
+- **Ctrl + Alt + D** — open Remote Dispatcher.
+- **Ctrl + Alt + R** — start/stop the retained target remotely, including after closing the Dispatcher for a cinematic.
 
-All bindings are normal FS25 actions and can be remapped in Controls.
+All vehicle/worker navigation is handled inside the GUI, so normal menu focus consumes arrows/D-pad rather than moving the player or camera.
 
-## v0.1.0.4 changes
+## Dispatcher GUI
 
-- Persistent remote selection independent of player distance.
-- Replaced arrow navigation with dedicated `-`, `=`, `\` and Enter actions so Dispatcher controls no longer move the player/camera.
-- Fixed-column overlay for vehicle, automation, state, target/course and distance.
-- Dispatcher visibility follows the main FS25 HUD.
-- Ctrl+Alt+R remains available while the panel/HUD is hidden for cinematic triggering.
-- Remotely started AD/CP vehicles are explicitly woken with `raiseActive()` and held active for five seconds so their automation update loop can begin without player proximity.
-- Existing AutoDrive discovery/start diagnostics retained.
+The left list shows compatible owned vehicles with:
 
-## Workflow
+- vehicle name;
+- AutoDrive/Courseplay capability;
+- ready/active state;
+- assigned worker;
+- current AD destination or CP course.
 
-1. Prepare the vehicle's AutoDrive route/mode or Courseplay job normally.
-2. Open Remote Dispatcher and select the vehicle once.
-3. Move anywhere required for the camera shot.
-4. Close the Dispatcher or hide the main HUD if desired.
-5. Press **Ctrl + Alt + R** to start/stop the retained vehicle.
+The right list shows **AUTO** plus enabled HelperProfiles workers when API v7 is available.
+
+Buttons provide:
+
+- automation selection (AD/CP);
+- worker assignment;
+- dispatch/stop;
+- close.
+
+## HelperProfiles integration
+
+`AUTO` keeps normal HelperProfiles/game helper selection.
+
+A named assignment such as `MT635 -> Rhys` uses HelperProfiles API v7 `beginPreferredHire()` / `endPreferredHire()` around the synchronous AutoDrive/Courseplay start. The scoped request is fail-closed: if Rhys is active, off roster, or unavailable, the dispatch fails rather than silently substituting another worker.
+
+The normal HelperProfiles selected worker is not changed.
+
+Worker assignments are runtime/session state in this first GUI build; save persistence can be added after the interaction is proven.
+
+## Remote vehicle activation
+
+The v0.1.0.4 wake logic is retained. Remote Dispatcher calls `raiseActive()` before/after starting automation and briefly keeps the vehicle active so distant AutoDrive/Courseplay tasks begin without requiring player proximity.
 
 Single-player only for the current prototype.
