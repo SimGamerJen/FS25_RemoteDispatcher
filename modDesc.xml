@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen</author>
-    <version>0.3.0.0</version>
+    <version>0.3.0.1</version>
     <iconFilename>RemoteDispatcher.dds</iconFilename>
 
     <title><en>Remote Dispatcher</en></title>
     <description><en><![CDATA[
-Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the vehicle.
+Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the target vehicle.
 
-Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained cinematic target, position the camera, then press Ctrl+Alt+R to start or stop that vehicle remotely.
+Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained target, then press Ctrl+Alt+R to start or stop that vehicle remotely. The selector, target cycling and remote action are available both on foot and while driving another vehicle.
 
-Version 0.3.0.0 adds per-save persistence for automation/worker assignments and the retained target. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
+Version 0.3.0.1 adds vehicle-context input support and changes the default Management shortcut to Ctrl+Alt+J to avoid AutoDrive's Ctrl+Alt+M notification-history binding. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
 
 Early alpha. Single-player only. Back up important savegames before testing.
     ]]></en></description>
 
     <changelog><en><![CDATA[
+0.3.0.1:
+- Added Remote Dispatcher input actions to the FS25 vehicle input context.
+- The target selector can now be opened while driving another vehicle.
+- Previous/next target cycling now works while driving.
+- Ctrl+Alt+R can now start/stop the retained remote target while the player is in another vehicle.
+- Management can now be opened from the vehicle context.
+- Changed the default Management shortcut from Ctrl+Alt+M to Ctrl+Alt+J to avoid AutoDrive's notification-history binding.
+
 0.3.0.0:
 - First public early-alpha release.
 - Added per-save persistence keyed to FS25 vehicle unique IDs.
@@ -45,16 +53,17 @@ Early alpha. Single-player only. Back up important savegames before testing.
         <sourceFile filename="scripts/RemoteDispatcherState.lua" />
         <sourceFile filename="scripts/RemoteDispatcherScreen.lua" />
         <sourceFile filename="scripts/RemoteDispatcherSelector.lua" />
+        <sourceFile filename="scripts/RemoteDispatcherVehicleInput.lua" />
         <sourceFile filename="scripts/RemoteDispatcherPersistence.lua" />
         <sourceFile filename="scripts/RemoteDispatcherDiagnostics.lua" />
     </extraSourceFiles>
 
     <actions>
-        <action name="RDC_TOGGLE_SELECTOR" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_OPEN_MANAGEMENT" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_CYCLE_TARGET" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_CYCLE_TARGET_PREVIOUS" category="ONFOOT" axisType="HALF" />
-        <action name="RDC_REMOTE_ACTION" category="ONFOOT" axisType="HALF" />
+        <action name="RDC_TOGGLE_SELECTOR" category="ONFOOT VEHICLE" axisType="HALF" />
+        <action name="RDC_OPEN_MANAGEMENT" category="ONFOOT VEHICLE" axisType="HALF" />
+        <action name="RDC_CYCLE_TARGET" category="ONFOOT VEHICLE" axisType="HALF" />
+        <action name="RDC_CYCLE_TARGET_PREVIOUS" category="ONFOOT VEHICLE" axisType="HALF" />
+        <action name="RDC_REMOTE_ACTION" category="ONFOOT VEHICLE" axisType="HALF" />
         <action name="RDC_GUI_PROVIDER" category="MENU" axisType="HALF" />
         <action name="RDC_GUI_ASSIGN" category="MENU" axisType="HALF" />
     </actions>
@@ -64,7 +73,7 @@ Early alpha. Single-player only. Back up important savegames before testing.
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
         </actionBinding>
         <actionBinding action="RDC_OPEN_MANAGEMENT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_m" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_j" />
         </actionBinding>
         <actionBinding action="RDC_CYCLE_TARGET">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_equals" />
