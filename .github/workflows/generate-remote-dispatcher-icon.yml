@@ -1,0 +1,45 @@
+name: Generate Remote Dispatcher icon
+
+on:
+  push:
+    branches:
+      - assets/remote-dispatcher-icon
+    paths:
+      - tools/generate_remote_dispatcher_icon.py
+      - .github/workflows/generate-remote-dispatcher-icon.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate-icon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: assets/remote-dispatcher-icon
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Generate DDS
+        run: python tools/generate_remote_dispatcher_icon.py
+
+      - name: Commit generated icon
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add RemoteDispatcher.dds
+          if git diff --cached --quiet; then
+            echo "RemoteDispatcher.dds is already current."
+            exit 0
+          fi
+          git commit -m "Add Remote Dispatcher DDS icon"
+          git push origin HEAD:assets/remote-dispatcher-icon
