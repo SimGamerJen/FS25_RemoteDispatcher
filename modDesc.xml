@@ -2,6 +2,7 @@
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen</author>
     <version>0.3.0.0</version>
+    <iconFilename>RemoteDispatcher.dds</iconFilename>
 
     <title><en>Remote Dispatcher</en></title>
     <description><en><![CDATA[
