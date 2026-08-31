@@ -45,8 +45,22 @@ jobs:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
 
           version = mod.findtext('version')
-          if version != '0.3.0.0':
+          if version != '0.3.0.1':
               raise SystemExit(f'Unexpected version: {version}')
+
+          vehicle_actions = {
+              'RDC_TOGGLE_SELECTOR',
+              'RDC_OPEN_MANAGEMENT',
+              'RDC_CYCLE_TARGET',
+              'RDC_CYCLE_TARGET_PREVIOUS',
+              'RDC_REMOTE_ACTION',
+          }
+          for action in mod.findall('./actions/action'):
+              name = action.attrib.get('name')
+              if name in vehicle_actions:
+                  category = action.attrib.get('category', '')
+                  if 'ONFOOT' not in category or 'VEHICLE' not in category:
+                      raise SystemExit(f'{name} missing ONFOOT/VEHICLE categories: {category}')
           PY
 
       - name: Build FS25 mod ZIP
@@ -55,7 +69,7 @@ jobs:
           set -euo pipefail
           rm -f FS25_RemoteDispatcher.zip
           zip -r FS25_RemoteDispatcher.zip \
-            modDesc.xml README.md gui scripts translations docs \
+            modDesc.xml README.md RemoteDispatcher.dds gui scripts translations docs \
             -x '*.DS_Store' '*__MACOSX*' '.git*'
 
           python - <<'PY'
@@ -63,7 +77,9 @@ jobs:
           with zipfile.ZipFile('FS25_RemoteDispatcher.zip') as z:
               required = {
                   'modDesc.xml',
+                  'RemoteDispatcher.dds',
                   'scripts/RemoteDispatcher.lua',
+                  'scripts/RemoteDispatcherVehicleInput.lua',
                   'scripts/RemoteDispatcherPersistence.lua',
                   'scripts/RemoteDispatcherDiagnostics.lua',
                   'gui/RemoteDispatcherScreen.xml',
@@ -79,6 +95,6 @@ jobs:
       - name: Upload alpha validation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FS25_RemoteDispatcher_0.3.0.0-alpha
+          name: FS25_RemoteDispatcher_0.3.0.1-alpha2-test
           path: FS25_RemoteDispatcher.zip
           retention-days: 14
