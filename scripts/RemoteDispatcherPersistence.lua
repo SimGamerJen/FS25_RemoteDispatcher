@@ -1,4 +1,4 @@
--- FS25_RemoteDispatcher v0.3.0.0
+-- FS25_RemoteDispatcher v0.3.0.1
 -- Per-save persistence for vehicle automation/worker assignments and retained target.
 
 if RemoteDispatcher == nil then
@@ -6,7 +6,7 @@ if RemoteDispatcher == nil then
     return
 end
 
-RemoteDispatcher.VERSION = "0.3.0.0"
+RemoteDispatcher.VERSION = "0.3.0.1"
 
 RemoteDispatcherPersistence = RemoteDispatcherPersistence or {
     initialized = false,
