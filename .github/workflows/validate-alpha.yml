@@ -48,6 +48,24 @@ jobs:
           if version != '0.3.0.1':
               raise SystemExit(f'Unexpected version: {version}')
 
+          action_names = {
+              action.attrib.get('name')
+              for action in mod.findall('./actions/action')
+              if action.attrib.get('name')
+          }
+          l10n = ET.parse(root / 'translations' / 'l10n_en.xml').getroot()
+          l10n_names = {
+              text.attrib.get('name')
+              for text in l10n.findall('./texts/text')
+              if text.attrib.get('name')
+          }
+          missing_action_l10n = sorted(
+              f'input_{name}' for name in action_names
+              if f'input_{name}' not in l10n_names
+          )
+          if missing_action_l10n:
+              raise SystemExit(f'Missing input action localisation: {missing_action_l10n}')
+
           vehicle_actions = {
               'RDC_TOGGLE_SELECTOR',
               'RDC_OPEN_MANAGEMENT',
