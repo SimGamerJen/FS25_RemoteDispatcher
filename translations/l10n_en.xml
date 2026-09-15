@@ -6,6 +6,8 @@
         <text name="input_RDC_CYCLE_TARGET" text="Remote Dispatcher: Next target" />
         <text name="input_RDC_CYCLE_TARGET_PREVIOUS" text="Remote Dispatcher: Previous target" />
         <text name="input_RDC_REMOTE_ACTION" text="Remote Dispatcher: Start/stop retained target" />
+        <text name="input_RDC_GUI_PROVIDER" text="Remote Dispatcher: Change automation provider" />
+        <text name="input_RDC_GUI_ASSIGN" text="Remote Dispatcher: Assign selected worker" />
 
         <text name="rd_management_title" text="REMOTE DISPATCHER MANAGEMENT" />
         <text name="rd_header_vehicles" text="VEHICLES" />
