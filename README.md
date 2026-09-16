@@ -4,9 +4,9 @@ Remote Dispatcher is a single-player Farming Simulator 25 script mod for remotel
 
 ## Current status
 
-**v0.3.0.1 — alpha.2 test candidate**
+**v0.3.0.2 — alpha.3 maintenance release**
 
-The first public alpha exposed an input-context limitation: Remote Dispatcher controls were registered only while the player was on foot. Version 0.3.0.1 adds the same live dispatcher actions to FS25's vehicle input context so another prepared worker can be selected and dispatched while the player is driving a different vehicle.
+Version 0.3.0.2 is a maintenance alpha. It keeps the vehicle-context dispatch workflow introduced in 0.3.0.1 and fixes the two missing Management action localisation entries reported during integration testing. Release validation now also checks that every declared input action has a matching English localisation entry before packaging.
 
 > **Alpha dependency:** Remote Dispatcher is released and tested against **HelperProfiles 2.1.1.0**. Install HelperProfiles 2.1.1.0 alongside this alpha before reporting Remote Dispatcher issues.
 
