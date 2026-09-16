@@ -1,0 +1,108 @@
+name: Remote Dispatcher alpha bug report
+description: Report an issue found while testing a Remote Dispatcher alpha release.
+title: "[Alpha Bug] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing Remote Dispatcher. Please include enough runtime detail to reproduce the problem.
+
+  - type: input
+    id: rd_version
+    attributes:
+      label: Remote Dispatcher version
+      placeholder: 0.3.0.2-alpha.3
+    validations:
+      required: true
+
+  - type: input
+    id: hp_version
+    attributes:
+      label: HelperProfiles version
+      placeholder: 2.1.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: automation_versions
+    attributes:
+      label: AutoDrive / Courseplay version
+      description: Enter the version of whichever automation mod was involved.
+      placeholder: AutoDrive ..., Courseplay ...
+    validations:
+      required: true
+
+  - type: input
+    id: map_vehicle
+    attributes:
+      label: Map and vehicle
+      placeholder: Map name; vehicle/mod name
+    validations:
+      required: true
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Automation provider
+      options:
+        - AutoDrive
+        - Courseplay
+        - Both installed / unsure which path
+    validations:
+      required: true
+
+  - type: dropdown
+    id: worker
+    attributes:
+      label: Worker assignment
+      options:
+        - AUTO
+        - Named HelperProfiles worker
+    validations:
+      required: true
+
+  - type: dropdown
+    id: player_context
+    attributes:
+      label: Player context when the problem occurred
+      options:
+        - On foot
+        - Controlling another vehicle
+        - In a menu / Management GUI
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Describe the prepared task and the exact Remote Dispatcher actions used.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected and actual behaviour
+      placeholder: Expected ...; Actual ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: rdStatus output
+      description: Run rdStatus in the developer console and paste the relevant Remote Dispatcher/Status lines.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant log.txt excerpt or link
+      description: Include the surrounding RemoteDispatcher, HelperProfiles, AutoDrive and/or Courseplay lines. A full log is preferred when practical.
+      render: text
+    validations:
+      required: true
