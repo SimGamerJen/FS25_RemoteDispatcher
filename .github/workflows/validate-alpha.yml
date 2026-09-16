@@ -45,7 +45,7 @@ jobs:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
 
           version = mod.findtext('version')
-          if version != '0.3.0.1':
+          if version != '0.3.0.2':
               raise SystemExit(f'Unexpected version: {version}')
 
           action_names = {
@@ -101,6 +101,7 @@ jobs:
                   'scripts/RemoteDispatcherPersistence.lua',
                   'scripts/RemoteDispatcherDiagnostics.lua',
                   'gui/RemoteDispatcherScreen.xml',
+                  'translations/l10n_en.xml',
               }
               missing = required - set(z.namelist())
               if missing:
@@ -113,6 +114,6 @@ jobs:
       - name: Upload alpha validation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FS25_RemoteDispatcher_0.3.0.1-alpha2-test
+          name: FS25_RemoteDispatcher_0.3.0.2-alpha3-test
           path: FS25_RemoteDispatcher.zip
           retention-days: 14
