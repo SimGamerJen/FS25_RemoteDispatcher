@@ -4,9 +4,9 @@
     <version>0.3.0.4</version>
     <iconFilename>RemoteDispatcher.dds</iconFilename>
 
-    <title><en>Remote Dispatcher</en></title>
+    <title><en>Remote Dispatcher - Vehicle Input Diagnostic</en></title>
     <description><en><![CDATA[
-Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the target vehicle.
+DIAGNOSTIC BUILD: 0.3.0.4-alpha.5 vehicle-input tracing. Behaviour is intentionally unchanged; this build logs vehicle input registration decisions for intermittent in-vehicle keybind failures.\n\nRemote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the target vehicle.
 
 Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained target, then press Ctrl+Alt+R to start or stop that vehicle remotely. The selector, target cycling and remote action are available both on foot and while driving another vehicle.
 
