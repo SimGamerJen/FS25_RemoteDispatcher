@@ -105,7 +105,15 @@ end
 
 function RemoteDispatcher:registerActionEvents()
     if g_inputBinding == nil then return end
-    g_inputBinding:removeActionEventsByTarget(self)
+
+    -- Remove only the player-context events previously registered by this
+    -- routine. Do not remove every event targeting RemoteDispatcher: vehicle
+    -- actions are owned by each vehicle's actionEvents table and may coexist.
+    if g_inputBinding.removeActionEvent ~= nil then
+        for _, eventId in ipairs(self.actionEventIds or {}) do
+            pcall(function() g_inputBinding:removeActionEvent(eventId) end)
+        end
+    end
     self.actionEventIds = {}
 
     local function register(actionName, callback, textKey, visible)
