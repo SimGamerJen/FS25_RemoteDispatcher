@@ -1,8 +1,8 @@
--- FS25_RemoteDispatcher v0.3.0.3
+-- FS25_RemoteDispatcher v0.3.0.4
 -- Support diagnostics for early alpha testing.
 
 if RemoteDispatcher == nil then return end
-RemoteDispatcher.VERSION = "0.3.0.3"
+RemoteDispatcher.VERSION = "0.3.0.4"
 
 RemoteDispatcherDiagnostics = RemoteDispatcherDiagnostics or {}
 
