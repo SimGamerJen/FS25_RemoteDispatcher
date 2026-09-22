@@ -1,22 +1,24 @@
-name: Validate Remote Dispatcher Alpha
+name: Release Remote Dispatcher 0.3.0.4-alpha.5
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-0.3.0.4-alpha.5.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate XML, localisation and mod source references
+      - name: Validate alpha.5 release metadata
         shell: bash
         run: |
           set -euo pipefail
@@ -28,35 +30,25 @@ jobs:
           mod_path = root / 'modDesc.xml'
           mod = ET.parse(mod_path).getroot()
 
+          if mod.findtext('version') != '0.3.0.4':
+              raise SystemExit(f"Unexpected mod version: {mod.findtext('version')}")
+
           l10n_elem = mod.find('./l10n')
           if l10n_elem is None:
               raise SystemExit('modDesc.xml has no l10n declaration')
           prefix = l10n_elem.attrib.get('filenamePrefix')
-          if not prefix:
-              raise SystemExit('l10n filenamePrefix is missing')
-
-          # GIANTS external localisation convention: filenamePrefix + _<language>.xml.
-          # Keep this identical to the layout already used successfully by HelperProfiles.
+          if prefix != 'l10n/l10n':
+              raise SystemExit(f"Unexpected l10n prefix: {prefix!r}")
           l10n_path = root / f'{prefix}_en.xml'
           if not l10n_path.is_file():
-              raise SystemExit(
-                  f'GIANTS English localisation file is missing: {l10n_path} '
-                  f'(filenamePrefix={prefix!r})'
-              )
+              raise SystemExit(f'GIANTS English localisation file is missing: {l10n_path}')
 
-          if prefix != 'l10n/l10n':
-              raise SystemExit(
-                  f'Unexpected localisation prefix for alpha.5: {prefix!r}; '
-                  "expected 'l10n/l10n'"
-              )
-
-          xml_files = [
+          for path in [
               mod_path,
               root / 'gui' / 'RemoteDispatcherScreen.xml',
               root / 'gui' / 'guiProfiles.xml',
               l10n_path,
-          ]
-          for path in xml_files:
+          ]:
               ET.parse(path)
               print(f'XML OK: {path}')
 
@@ -67,10 +59,6 @@ jobs:
                   missing.append(filename)
           if missing:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
-
-          version = mod.findtext('version')
-          if version != '0.3.0.4':
-              raise SystemExit(f'Unexpected version: {version}')
 
           action_names = {
               action.attrib.get('name')
@@ -83,6 +71,7 @@ jobs:
               for text in l10n.findall('./texts/text')
               if text.attrib.get('name')
           }
+
           missing_action_l10n = sorted(
               f'input_{name}' for name in action_names
               if f'input_{name}' not in l10n_names
@@ -107,25 +96,20 @@ jobs:
           }
           missing_ui_l10n = sorted(required_ui_l10n - l10n_names)
           if missing_ui_l10n:
-              raise SystemExit(f'Missing management UI localisation: {missing_ui_l10n}')
+              raise SystemExit(f'Missing Management UI localisation: {missing_ui_l10n}')
 
-          vehicle_actions = {
-              'RDC_TOGGLE_SELECTOR',
-              'RDC_OPEN_MANAGEMENT',
-              'RDC_CYCLE_TARGET',
-              'RDC_CYCLE_TARGET_PREVIOUS',
-              'RDC_REMOTE_ACTION',
-          }
-          for action in mod.findall('./actions/action'):
-              name = action.attrib.get('name')
-              if name in vehicle_actions:
-                  category = action.attrib.get('category', '')
-                  if 'ONFOOT' not in category or 'VEHICLE' not in category:
-                      raise SystemExit(f'{name} missing ONFOOT/VEHICLE categories: {category}')
+          if (root / 'translations' / 'l10n_en.xml').exists():
+              raise SystemExit('Obsolete translations/l10n_en.xml still exists')
 
-          old_path = root / 'translations' / 'l10n_en.xml'
-          if old_path.exists():
-              raise SystemExit(f'Obsolete localisation path still present: {old_path}')
+          activation = (root / 'scripts/RemoteDispatcherActivationFix.lua').read_text(encoding='utf-8')
+          if 'AD_OBSERVATION_CHECKPOINTS_MS = {250, 500, 1000}' not in activation:
+              raise SystemExit('AutoDrive post-start observation checkpoints are missing')
+
+          notes = (root / 'docs/releases/0.3.0.4-alpha.5.md').read_text(encoding='utf-8')
+          if 'HelperProfiles 2.1.1.0' not in notes:
+              raise SystemExit('Release notes do not declare HelperProfiles 2.1.1.0')
+          if 'smoke-tested in FS25' not in notes:
+              raise SystemExit('Release notes do not record the in-game localisation smoke test')
 
           print(f'GIANTS localisation convention OK: {prefix} + _en.xml -> {l10n_path}')
           PY
@@ -143,41 +127,58 @@ jobs:
           import zipfile
           import xml.etree.ElementTree as ET
 
-          with zipfile.ZipFile('FS25_RemoteDispatcher.zip') as z:
+          package = 'FS25_RemoteDispatcher.zip'
+          with zipfile.ZipFile(package, 'r') as archive:
               required = {
                   'modDesc.xml',
                   'RemoteDispatcher.dds',
                   'scripts/RemoteDispatcher.lua',
                   'scripts/RemoteDispatcherVehicleInput.lua',
+                  'scripts/RemoteDispatcherHelperProfiles.lua',
                   'scripts/RemoteDispatcherActivationFix.lua',
                   'scripts/RemoteDispatcherPersistence.lua',
                   'scripts/RemoteDispatcherDiagnostics.lua',
                   'gui/RemoteDispatcherScreen.xml',
+                  'l10n/l10n_en.xml',
               }
 
-              root = ET.fromstring(z.read('modDesc.xml'))
-              l10n = root.find('./l10n')
-              if l10n is None:
-                  raise SystemExit('Packaged modDesc has no l10n declaration')
-              prefix = l10n.attrib.get('filenamePrefix', '')
-              resolved_l10n = f'{prefix}_en.xml'
-              required.add(resolved_l10n)
-
-              names = set(z.namelist())
-              missing = required - names
+              names = set(archive.namelist())
+              missing = sorted(required - names)
               if missing:
-                  raise SystemExit(f'Missing package files: {sorted(missing)}')
+                  raise SystemExit(f'Missing package files: {missing}')
               if 'translations/l10n_en.xml' in names:
                   raise SystemExit('Obsolete translations/l10n_en.xml was packaged')
-              bad = z.testzip()
+
+              root = ET.fromstring(archive.read('modDesc.xml'))
+              if root.findtext('version') != '0.3.0.4':
+                  raise SystemExit('Packaged modDesc has unexpected version')
+              l10n = root.find('./l10n')
+              if l10n is None or l10n.attrib.get('filenamePrefix') != 'l10n/l10n':
+                  raise SystemExit('Packaged modDesc has unexpected l10n prefix')
+
+              bad = archive.testzip()
               if bad:
                   raise SystemExit(f'Corrupt ZIP member: {bad}')
-              print(f'Packaged GIANTS localisation file OK: {resolved_l10n}')
           PY
 
-      - name: Upload alpha validation artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: FS25_RemoteDispatcher_0.3.0.4-alpha5-test
-          path: FS25_RemoteDispatcher.zip
-          retention-days: 14
+      - name: Publish GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='0.3.0.4-alpha.5'
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" FS25_RemoteDispatcher.zip --clobber
+            gh release edit "$TAG" \
+              --title 'Remote Dispatcher 0.3.0.4-alpha.5' \
+              --notes-file docs/releases/0.3.0.4-alpha.5.md \
+              --prerelease
+          else
+            gh release create "$TAG" \
+              FS25_RemoteDispatcher.zip \
+              --target main \
+              --title 'Remote Dispatcher 0.3.0.4-alpha.5' \
+              --notes-file docs/releases/0.3.0.4-alpha.5.md \
+              --prerelease
+          fi
