@@ -4,9 +4,11 @@ Remote Dispatcher is a single-player Farming Simulator 25 script mod for remotel
 
 ## Current status
 
-**v0.3.0.2 — alpha.3 maintenance release**
+**v0.3.0.3 — alpha.4 maintenance release**
 
-Version 0.3.0.2 is a maintenance alpha. It keeps the vehicle-context dispatch workflow introduced in 0.3.0.1 and fixes the two missing Management action localisation entries reported during integration testing. Release validation now also checks that every declared input action has a matching English localisation entry before packaging.
+Version 0.3.0.3 fixes the GIANTS localisation filename-prefix mismatch discovered during Cline Ridge testing. Validation now derives the localisation filename exactly as FS25 does instead of assuming a repository path. This release also adds passive AutoDrive post-start observation so an unexpected early shutdown is recorded in `log.txt` without Remote Dispatcher retrying or changing the job.
+
+There are no intentional changes to AutoDrive/Courseplay start, stop, wake, HelperProfiles assignment or persistence behaviour.
 
 > **Alpha dependency:** Remote Dispatcher is released and tested against **HelperProfiles 2.1.1.0**. Install HelperProfiles 2.1.1.0 alongside this alpha before reporting Remote Dispatcher issues.
 
@@ -67,7 +69,9 @@ Run this in the developer console when reporting an alpha issue:
 
 `rdStatus`
 
-It prints the detected vehicles, retained target, AD/CP provider, worker assignment, HelperProfiles API state, persistence file path, and whether the vehicle input hook is installed to `log.txt`.
+It prints the detected vehicles, retained target, AD/CP provider, worker assignment, HelperProfiles API state, persistence file path, vehicle-input hook state and whether the AutoDrive post-start observer is installed.
+
+For AutoDrive starts, alpha.4 also watches the first second after a successful remote start. If AutoDrive becomes inactive during that window, Remote Dispatcher writes an `AD post-start observation` warning with the observed timing, helper index, configured destination IDs and remaining wake hold. This observer is diagnostic only: it does not restart AutoDrive or alter the task.
 
 For a useful issue report, include `log.txt`, the `rdStatus` output, the vehicle involved, whether the task was AutoDrive or Courseplay, and whether the worker assignment was AUTO or named.
 
