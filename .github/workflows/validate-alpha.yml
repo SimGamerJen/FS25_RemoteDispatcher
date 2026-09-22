@@ -16,7 +16,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate XML and mod source references
+      - name: Validate XML, localisation and mod source references
         shell: bash
         run: |
           set -euo pipefail
@@ -25,17 +25,33 @@ jobs:
           import xml.etree.ElementTree as ET
 
           root = Path('.')
+          mod_path = root / 'modDesc.xml'
+          mod = ET.parse(mod_path).getroot()
+
+          l10n_elem = mod.find('./l10n')
+          if l10n_elem is None:
+              raise SystemExit('modDesc.xml has no l10n declaration')
+          prefix = l10n_elem.attrib.get('filenamePrefix')
+          language = l10n_elem.attrib.get('defaultLanguage')
+          if not prefix or not language:
+              raise SystemExit('l10n filenamePrefix/defaultLanguage is incomplete')
+          l10n_path = root / f'{prefix}{language}.xml'
+          if not l10n_path.is_file():
+              raise SystemExit(
+                  f'GIANTS-resolved localisation file is missing: {l10n_path} '
+                  f'(prefix={prefix!r}, defaultLanguage={language!r})'
+              )
+
           xml_files = [
-              root / 'modDesc.xml',
+              mod_path,
               root / 'gui' / 'RemoteDispatcherScreen.xml',
               root / 'gui' / 'guiProfiles.xml',
-              root / 'translations' / 'l10n_en.xml',
+              l10n_path,
           ]
           for path in xml_files:
               ET.parse(path)
               print(f'XML OK: {path}')
 
-          mod = ET.parse(root / 'modDesc.xml').getroot()
           missing = []
           for elem in mod.findall('./extraSourceFiles/sourceFile'):
               filename = elem.attrib.get('filename')
@@ -45,7 +61,7 @@ jobs:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
 
           version = mod.findtext('version')
-          if version != '0.3.0.2':
+          if version != '0.3.0.3':
               raise SystemExit(f'Unexpected version: {version}')
 
           action_names = {
@@ -53,7 +69,7 @@ jobs:
               for action in mod.findall('./actions/action')
               if action.attrib.get('name')
           }
-          l10n = ET.parse(root / 'translations' / 'l10n_en.xml').getroot()
+          l10n = ET.parse(l10n_path).getroot()
           l10n_names = {
               text.attrib.get('name')
               for text in l10n.findall('./texts/text')
@@ -79,6 +95,8 @@ jobs:
                   category = action.attrib.get('category', '')
                   if 'ONFOOT' not in category or 'VEHICLE' not in category:
                       raise SystemExit(f'{name} missing ONFOOT/VEHICLE categories: {category}')
+
+          print(f'GIANTS localisation resolution OK: {prefix}+{language}.xml -> {l10n_path}')
           PY
 
       - name: Build FS25 mod ZIP
@@ -92,28 +110,42 @@ jobs:
 
           python - <<'PY'
           import zipfile
+          import xml.etree.ElementTree as ET
+
           with zipfile.ZipFile('FS25_RemoteDispatcher.zip') as z:
               required = {
                   'modDesc.xml',
                   'RemoteDispatcher.dds',
                   'scripts/RemoteDispatcher.lua',
                   'scripts/RemoteDispatcherVehicleInput.lua',
+                  'scripts/RemoteDispatcherActivationFix.lua',
                   'scripts/RemoteDispatcherPersistence.lua',
                   'scripts/RemoteDispatcherDiagnostics.lua',
                   'gui/RemoteDispatcherScreen.xml',
-                  'translations/l10n_en.xml',
               }
+
+              root = ET.fromstring(z.read('modDesc.xml'))
+              l10n = root.find('./l10n')
+              if l10n is None:
+                  raise SystemExit('Packaged modDesc has no l10n declaration')
+              resolved_l10n = (
+                  f"{l10n.attrib.get('filenamePrefix', '')}"
+                  f"{l10n.attrib.get('defaultLanguage', '')}.xml"
+              )
+              required.add(resolved_l10n)
+
               missing = required - set(z.namelist())
               if missing:
                   raise SystemExit(f'Missing package files: {sorted(missing)}')
               bad = z.testzip()
               if bad:
                   raise SystemExit(f'Corrupt ZIP member: {bad}')
+              print(f'Packaged GIANTS localisation file OK: {resolved_l10n}')
           PY
 
       - name: Upload alpha validation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FS25_RemoteDispatcher_0.3.0.2-alpha3-test
+          name: FS25_RemoteDispatcher_0.3.0.3-alpha4-test
           path: FS25_RemoteDispatcher.zip
           retention-days: 14
