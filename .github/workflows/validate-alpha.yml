@@ -69,7 +69,7 @@ jobs:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
 
           version = mod.findtext('version')
-          if version != '0.3.0.4':
+          if version != '0.3.0.5':
               raise SystemExit(f'Unexpected version: {version}')
 
           action_names = {
@@ -122,6 +122,34 @@ jobs:
                   category = action.attrib.get('category', '')
                   if 'ONFOOT' not in category or 'VEHICLE' not in category:
                       raise SystemExit(f'{name} missing ONFOOT/VEHICLE categories: {category}')
+
+
+          vehicle_input = (root / 'scripts' / 'RemoteDispatcherVehicleInput.lua').read_text(encoding='utf-8')
+          selector = (root / 'scripts' / 'RemoteDispatcherSelector.lua').read_text(encoding='utf-8')
+
+          required_vehicle_input_markers = [
+              'function(vehicle, excludedVehicle)',
+              'vehicle.getIsActiveForInput',
+              'pcall(vehicle.getIsActiveForInput, vehicle)',
+              'vehicle:addActionEvent(',
+              'vehicle:clearActionEventsTable',
+              'Utils.appendedFunction',
+          ]
+          for marker in required_vehicle_input_markers:
+              if marker not in vehicle_input:
+                  raise SystemExit(f'Missing corrected vehicle-input marker: {marker}')
+
+          forbidden_vehicle_input_markers = [
+              'isActiveRootVehicle',
+              'beginActionEventsModification(Vehicle.INPUT_CONTEXT_NAME)',
+              'function(vehicle, isActiveForInput',
+          ]
+          for marker in forbidden_vehicle_input_markers:
+              if marker in vehicle_input:
+                  raise SystemExit(f'Legacy/incorrect vehicle-input path still present: {marker}')
+
+          if 'g_inputBinding:removeActionEventsByTarget(self)' in selector:
+              raise SystemExit('Selector still removes all RD action events by target')
 
           old_path = root / 'translations' / 'l10n_en.xml'
           if old_path.exists():
@@ -178,6 +206,6 @@ jobs:
       - name: Upload alpha validation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FS25_RemoteDispatcher_0.3.0.4-alpha5-test
+          name: FS25_RemoteDispatcher_0.3.0.5-alpha6-test
           path: FS25_RemoteDispatcher.zip
           retention-days: 14
