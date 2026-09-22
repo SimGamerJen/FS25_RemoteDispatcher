@@ -1,8 +1,8 @@
--- FS25_RemoteDispatcher v0.3.0.4
+-- FS25_RemoteDispatcher v0.3.0.5
 -- Support diagnostics for early alpha testing.
 
 if RemoteDispatcher == nil then return end
-RemoteDispatcher.VERSION = "0.3.0.4"
+RemoteDispatcher.VERSION = "0.3.0.5"
 
 RemoteDispatcherDiagnostics = RemoteDispatcherDiagnostics or {}
 
@@ -31,6 +31,7 @@ function RemoteDispatcherDiagnostics:status()
         tostring(hp.available == true), tostring(hp.apiVersion or 0), tostring(hp.supportsScopedPreferredHire == true),
         tostring(RemoteDispatcher.vehicleInputHookInstalled == true),
         tostring(type(RemoteDispatcher.updateAutoDriveObservations) == "function"))
+    line("vehicleInputMode=%s", tostring(RemoteDispatcher.vehicleInputMode or "legacy"))
 
     if persistence ~= nil then
         line("savegame=%s stateFile=%s records=%d selectedId=%s",
