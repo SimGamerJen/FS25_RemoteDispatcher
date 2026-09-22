@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen</author>
-    <version>0.3.0.4</version>
+    <version>0.3.0.5</version>
     <iconFilename>RemoteDispatcher.dds</iconFilename>
 
     <title><en>Remote Dispatcher</en></title>
@@ -10,12 +10,19 @@ Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Cours
 
 Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained target, then press Ctrl+Alt+R to start or stop that vehicle remotely. The selector, target cycling and remote action are available both on foot and while driving another vehicle.
 
-Version 0.3.0.4 moves localisation to the same l10n/l10n_<language>.xml layout already proven by HelperProfiles after FS25 failed to load the earlier translations/ layout. It retains the passive AutoDrive post-start diagnostics introduced in 0.3.0.3. Dispatch behaviour is unchanged. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
+Version 0.3.0.5 hardens in-vehicle input registration after some vehicles accepted HelperProfiles controls but not Remote Dispatcher controls. RD now uses the vehicle's native action-event lifecycle, matching the proven HelperProfiles approach, and isolates on-foot action-event cleanup from vehicle events. Dispatch behaviour is unchanged. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
 
 Early alpha. Single-player only. Back up important savegames before testing.
     ]]></en></description>
 
     <changelog><en><![CDATA[
+0.3.0.5:
+- Reworked in-vehicle controls to use vehicle:addActionEvent with FS25's isActiveForInput lifecycle.
+- Replaced the custom active-root-vehicle gate and global Vehicle input-context modification.
+- Isolated on-foot RD action cleanup so it cannot remove per-vehicle RD action events.
+- Added vehicle input registration diagnostics for compatibility testing.
+- No AutoDrive/Courseplay dispatch, wake, HelperProfiles assignment or persistence behaviour changes.
+
 0.3.0.4:
 - Moved English localisation to l10n/l10n_en.xml and aligned modDesc.xml with the proven HelperProfiles localisation convention.
 - Removed the previous translations/ localisation path after FS25 1.23.1.0 still failed to load it.
