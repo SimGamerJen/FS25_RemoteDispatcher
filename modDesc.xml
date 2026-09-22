@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen</author>
-    <version>0.3.0.3</version>
+    <version>0.3.0.4</version>
     <iconFilename>RemoteDispatcher.dds</iconFilename>
 
     <title><en>Remote Dispatcher</en></title>
@@ -10,14 +10,20 @@ Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Cours
 
 Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained target, then press Ctrl+Alt+R to start or stop that vehicle remotely. The selector, target cycling and remote action are available both on foot and while driving another vehicle.
 
-Version 0.3.0.3 fixes the English localisation filename-prefix mismatch exposed by FS25, strengthens release validation around GIANTS localisation resolution, and adds passive AutoDrive post-start diagnostics for transient remote-start failures. Dispatch behaviour is unchanged from 0.3.0.2. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
+Version 0.3.0.4 moves localisation to the same l10n/l10n_<language>.xml layout already proven by HelperProfiles after FS25 failed to load the earlier translations/ layout. It retains the passive AutoDrive post-start diagnostics introduced in 0.3.0.3. Dispatch behaviour is unchanged. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
 
 Early alpha. Single-player only. Back up important savegames before testing.
     ]]></en></description>
 
     <changelog><en><![CDATA[
+0.3.0.4:
+- Moved English localisation to l10n/l10n_en.xml and aligned modDesc.xml with the proven HelperProfiles localisation convention.
+- Removed the previous translations/ localisation path after FS25 1.23.1.0 still failed to load it.
+- Updated validation to enforce the GIANTS filename convention prefix + _<language>.xml in both source and packaged ZIP.
+- No dispatch behaviour changes.
+
 0.3.0.3:
-- Fixed the GIANTS localisation filename-prefix mismatch so FS25 can resolve translations/l10n_en.xml.
+- Attempted to fix the GIANTS localisation filename-prefix mismatch for translations/l10n_en.xml.
 - Validation now derives and checks the localisation filename from modDesc.xml instead of assuming a repository path.
 - Added passive AutoDrive post-start observation to log unexpected early shutdowns without retrying or changing dispatch behaviour.
 - No AutoDrive/Courseplay start, stop, wake, HelperProfiles or persistence behaviour changes.
@@ -54,7 +60,7 @@ Early alpha. Single-player only. Back up important savegames before testing.
     ]]></en></changelog>
 
     <multiplayer supported="false" />
-    <l10n filenamePrefix="translations/l10n_" defaultLanguage="en" />
+    <l10n filenamePrefix="l10n/l10n" />
 
     <extraSourceFiles>
         <sourceFile filename="scripts/RemoteDispatcher.lua" />
