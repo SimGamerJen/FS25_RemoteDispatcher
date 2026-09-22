@@ -1,22 +1,24 @@
-name: Validate Remote Dispatcher Alpha
+name: Release Remote Dispatcher 0.3.0.3-alpha.4
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-0.3.0.3-alpha.4.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate XML, localisation and mod source references
+      - name: Validate alpha.4 release metadata
         shell: bash
         run: |
           set -euo pipefail
@@ -27,6 +29,9 @@ jobs:
           root = Path('.')
           mod_path = root / 'modDesc.xml'
           mod = ET.parse(mod_path).getroot()
+
+          if mod.findtext('version') != '0.3.0.3':
+              raise SystemExit(f"Unexpected mod version: {mod.findtext('version')}")
 
           l10n_elem = mod.find('./l10n')
           if l10n_elem is None:
@@ -42,13 +47,12 @@ jobs:
                   f'(prefix={prefix!r}, defaultLanguage={language!r})'
               )
 
-          xml_files = [
+          for path in [
               mod_path,
               root / 'gui' / 'RemoteDispatcherScreen.xml',
               root / 'gui' / 'guiProfiles.xml',
               l10n_path,
-          ]
-          for path in xml_files:
+          ]:
               ET.parse(path)
               print(f'XML OK: {path}')
 
@@ -59,10 +63,6 @@ jobs:
                   missing.append(filename)
           if missing:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
-
-          version = mod.findtext('version')
-          if version != '0.3.0.3':
-              raise SystemExit(f'Unexpected version: {version}')
 
           action_names = {
               action.attrib.get('name')
@@ -82,19 +82,24 @@ jobs:
           if missing_action_l10n:
               raise SystemExit(f'Missing input action localisation: {missing_action_l10n}')
 
-          vehicle_actions = {
-              'RDC_TOGGLE_SELECTOR',
-              'RDC_OPEN_MANAGEMENT',
-              'RDC_CYCLE_TARGET',
-              'RDC_CYCLE_TARGET_PREVIOUS',
-              'RDC_REMOTE_ACTION',
-          }
-          for action in mod.findall('./actions/action'):
-              name = action.attrib.get('name')
-              if name in vehicle_actions:
-                  category = action.attrib.get('category', '')
-                  if 'ONFOOT' not in category or 'VEHICLE' not in category:
-                      raise SystemExit(f'{name} missing ONFOOT/VEHICLE categories: {category}')
+          source_files = [e.attrib.get('filename') for e in mod.findall('./extraSourceFiles/sourceFile')]
+          for required_source in [
+              'scripts/RemoteDispatcherVehicleInput.lua',
+              'scripts/RemoteDispatcherActivationFix.lua',
+              'scripts/RemoteDispatcherDiagnostics.lua',
+          ]:
+              if required_source not in source_files:
+                  raise SystemExit(f'Required source layer is missing from modDesc.xml: {required_source}')
+
+          activation = (root / 'scripts/RemoteDispatcherActivationFix.lua').read_text(encoding='utf-8')
+          if 'AD_OBSERVATION_CHECKPOINTS_MS = {250, 500, 1000}' not in activation:
+              raise SystemExit('AutoDrive post-start observation checkpoints are missing')
+
+          notes = (root / 'docs/releases/0.3.0.3-alpha.4.md').read_text(encoding='utf-8')
+          if 'HelperProfiles 2.1.1.0' not in notes:
+              raise SystemExit('Release notes do not declare HelperProfiles 2.1.1.0')
+          if 'observational only' not in notes.lower():
+              raise SystemExit('Release notes do not state that post-start diagnostics are observational only')
 
           print(f'GIANTS localisation resolution OK: {prefix}+{language}.xml -> {l10n_path}')
           PY
@@ -112,19 +117,24 @@ jobs:
           import zipfile
           import xml.etree.ElementTree as ET
 
-          with zipfile.ZipFile('FS25_RemoteDispatcher.zip') as z:
+          package = 'FS25_RemoteDispatcher.zip'
+          with zipfile.ZipFile(package, 'r') as archive:
               required = {
                   'modDesc.xml',
                   'RemoteDispatcher.dds',
                   'scripts/RemoteDispatcher.lua',
                   'scripts/RemoteDispatcherVehicleInput.lua',
+                  'scripts/RemoteDispatcherHelperProfiles.lua',
                   'scripts/RemoteDispatcherActivationFix.lua',
                   'scripts/RemoteDispatcherPersistence.lua',
                   'scripts/RemoteDispatcherDiagnostics.lua',
                   'gui/RemoteDispatcherScreen.xml',
               }
 
-              root = ET.fromstring(z.read('modDesc.xml'))
+              root = ET.fromstring(archive.read('modDesc.xml'))
+              if root.findtext('version') != '0.3.0.3':
+                  raise SystemExit('Packaged modDesc has unexpected version')
+
               l10n = root.find('./l10n')
               if l10n is None:
                   raise SystemExit('Packaged modDesc has no l10n declaration')
@@ -134,18 +144,33 @@ jobs:
               )
               required.add(resolved_l10n)
 
-              missing = required - set(z.namelist())
+              missing = sorted(required - set(archive.namelist()))
               if missing:
-                  raise SystemExit(f'Missing package files: {sorted(missing)}')
-              bad = z.testzip()
+                  raise SystemExit(f'Missing package files: {missing}')
+              bad = archive.testzip()
               if bad:
                   raise SystemExit(f'Corrupt ZIP member: {bad}')
               print(f'Packaged GIANTS localisation file OK: {resolved_l10n}')
           PY
 
-      - name: Upload alpha validation artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: FS25_RemoteDispatcher_0.3.0.3-alpha4-test
-          path: FS25_RemoteDispatcher.zip
-          retention-days: 14
+      - name: Publish GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='0.3.0.3-alpha.4'
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" FS25_RemoteDispatcher.zip --clobber
+            gh release edit "$TAG" \
+              --title 'Remote Dispatcher 0.3.0.3-alpha.4' \
+              --notes-file docs/releases/0.3.0.3-alpha.4.md \
+              --prerelease
+          else
+            gh release create "$TAG" \
+              FS25_RemoteDispatcher.zip \
+              --target main \
+              --title 'Remote Dispatcher 0.3.0.3-alpha.4' \
+              --notes-file docs/releases/0.3.0.3-alpha.4.md \
+              --prerelease
+          fi
