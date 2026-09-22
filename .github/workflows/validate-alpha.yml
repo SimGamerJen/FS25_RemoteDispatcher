@@ -32,14 +32,22 @@ jobs:
           if l10n_elem is None:
               raise SystemExit('modDesc.xml has no l10n declaration')
           prefix = l10n_elem.attrib.get('filenamePrefix')
-          language = l10n_elem.attrib.get('defaultLanguage')
-          if not prefix or not language:
-              raise SystemExit('l10n filenamePrefix/defaultLanguage is incomplete')
-          l10n_path = root / f'{prefix}{language}.xml'
+          if not prefix:
+              raise SystemExit('l10n filenamePrefix is missing')
+
+          # GIANTS external localisation convention: filenamePrefix + _<language>.xml.
+          # Keep this identical to the layout already used successfully by HelperProfiles.
+          l10n_path = root / f'{prefix}_en.xml'
           if not l10n_path.is_file():
               raise SystemExit(
-                  f'GIANTS-resolved localisation file is missing: {l10n_path} '
-                  f'(prefix={prefix!r}, defaultLanguage={language!r})'
+                  f'GIANTS English localisation file is missing: {l10n_path} '
+                  f'(filenamePrefix={prefix!r})'
+              )
+
+          if prefix != 'l10n/l10n':
+              raise SystemExit(
+                  f'Unexpected localisation prefix for alpha.5: {prefix!r}; '
+                  "expected 'l10n/l10n'"
               )
 
           xml_files = [
@@ -61,7 +69,7 @@ jobs:
               raise SystemExit(f'Missing sourceFile entries: {missing}')
 
           version = mod.findtext('version')
-          if version != '0.3.0.3':
+          if version != '0.3.0.4':
               raise SystemExit(f'Unexpected version: {version}')
 
           action_names = {
@@ -82,6 +90,25 @@ jobs:
           if missing_action_l10n:
               raise SystemExit(f'Missing input action localisation: {missing_action_l10n}')
 
+          required_ui_l10n = {
+              'rd_management_title',
+              'rd_header_vehicles',
+              'rd_header_workers',
+              'rd_col_vehicle',
+              'rd_col_auto',
+              'rd_col_state',
+              'rd_col_worker',
+              'rd_col_task',
+              'rd_col_slot',
+              'rd_management_hint',
+              'rd_button_close',
+              'rd_button_automation',
+              'rd_button_assign',
+          }
+          missing_ui_l10n = sorted(required_ui_l10n - l10n_names)
+          if missing_ui_l10n:
+              raise SystemExit(f'Missing management UI localisation: {missing_ui_l10n}')
+
           vehicle_actions = {
               'RDC_TOGGLE_SELECTOR',
               'RDC_OPEN_MANAGEMENT',
@@ -96,7 +123,11 @@ jobs:
                   if 'ONFOOT' not in category or 'VEHICLE' not in category:
                       raise SystemExit(f'{name} missing ONFOOT/VEHICLE categories: {category}')
 
-          print(f'GIANTS localisation resolution OK: {prefix}+{language}.xml -> {l10n_path}')
+          old_path = root / 'translations' / 'l10n_en.xml'
+          if old_path.exists():
+              raise SystemExit(f'Obsolete localisation path still present: {old_path}')
+
+          print(f'GIANTS localisation convention OK: {prefix} + _en.xml -> {l10n_path}')
           PY
 
       - name: Build FS25 mod ZIP
@@ -105,7 +136,7 @@ jobs:
           set -euo pipefail
           rm -f FS25_RemoteDispatcher.zip
           zip -r FS25_RemoteDispatcher.zip \
-            modDesc.xml README.md RemoteDispatcher.dds gui scripts translations docs \
+            modDesc.xml README.md RemoteDispatcher.dds gui scripts l10n docs \
             -x '*.DS_Store' '*__MACOSX*' '.git*'
 
           python - <<'PY'
@@ -128,15 +159,16 @@ jobs:
               l10n = root.find('./l10n')
               if l10n is None:
                   raise SystemExit('Packaged modDesc has no l10n declaration')
-              resolved_l10n = (
-                  f"{l10n.attrib.get('filenamePrefix', '')}"
-                  f"{l10n.attrib.get('defaultLanguage', '')}.xml"
-              )
+              prefix = l10n.attrib.get('filenamePrefix', '')
+              resolved_l10n = f'{prefix}_en.xml'
               required.add(resolved_l10n)
 
-              missing = required - set(z.namelist())
+              names = set(z.namelist())
+              missing = required - names
               if missing:
                   raise SystemExit(f'Missing package files: {sorted(missing)}')
+              if 'translations/l10n_en.xml' in names:
+                  raise SystemExit('Obsolete translations/l10n_en.xml was packaged')
               bad = z.testzip()
               if bad:
                   raise SystemExit(f'Corrupt ZIP member: {bad}')
@@ -146,6 +178,6 @@ jobs:
       - name: Upload alpha validation artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FS25_RemoteDispatcher_0.3.0.3-alpha4-test
+          name: FS25_RemoteDispatcher_0.3.0.4-alpha5-test
           path: FS25_RemoteDispatcher.zip
           retention-days: 14
