@@ -74,8 +74,30 @@ local function addVehicleAction(vehicle, spec, actionName, callback, textKey, vi
     return eventId
 end
 
-function RemoteDispatcher:registerVehicleActionEvents(vehicle, isActiveForInput)
-    if vehicle == nil or vehicle.addActionEvent == nil or not isActiveForInput then
+local function isRootVehicle(vehicle)
+    if vehicle == nil then return false end
+    if vehicle.getRootVehicle == nil then return true end
+
+    local ok, root = pcall(function() return vehicle:getRootVehicle() end)
+    if not ok or root == nil then return true end
+    return root == vehicle
+end
+
+function RemoteDispatcher:registerVehicleActionEvents(vehicle, isActiveForInput, isActiveForInputIgnoreSelection)
+    if vehicle == nil or vehicle.addActionEvent == nil then
+        return
+    end
+
+    -- Vehicle.registerActionEvents is invoked for the controlled root and for
+    -- attached/selected vehicle objects. RD actions are global dispatcher
+    -- actions, so registering on more than one object can make one keypress
+    -- fire the callback multiple times (e.g. toggle open then closed).
+    if not isRootVehicle(vehicle) then
+        return
+    end
+
+    local active = isActiveForInput == true or isActiveForInputIgnoreSelection == true
+    if not active then
         return
     end
 
@@ -106,7 +128,7 @@ function RemoteDispatcher:registerVehicleActionEvents(vehicle, isActiveForInput)
             "Vehicle action events registered for '%s': count=%d activeForInput=%s",
             self:getVehicleName(vehicle),
             registered,
-            tostring(isActiveForInput)
+            tostring(active)
         )
         self._vehicleInputLogged[vehicle] = true
     end
@@ -137,8 +159,12 @@ function RemoteDispatcher.installVehicleInputHook()
 
     Vehicle.registerActionEvents = Utils.appendedFunction(
         Vehicle.registerActionEvents,
-        function(vehicle, isActiveForInput, isActiveForGUI)
-            RemoteDispatcher:registerVehicleActionEvents(vehicle, isActiveForInput == true)
+        function(vehicle, isActiveForInput, isActiveForInputIgnoreSelection)
+            RemoteDispatcher:registerVehicleActionEvents(
+                vehicle,
+                isActiveForInput,
+                isActiveForInputIgnoreSelection
+            )
         end
     )
 
