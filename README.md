@@ -4,9 +4,9 @@ Remote Dispatcher is a single-player Farming Simulator 25 script mod for remotel
 
 ## Current status
 
-**v0.3.0.4 — alpha.5 maintenance release**
+**v0.3.0.5 — alpha.6 vehicle-input test candidate**
 
-Version 0.3.0.4 moves Remote Dispatcher localisation to the same `l10n/l10n_en.xml` layout and `l10n/l10n` filename prefix already used successfully by HelperProfiles. This layout has now been verified in-game: the Management UI and input-action strings load normally. It retains the passive AutoDrive post-start observation introduced in 0.3.0.3.
+Version 0.3.0.5 is an in-vehicle input compatibility candidate. Some vehicles could still use HelperProfiles controls while Remote Dispatcher controls were unavailable until the player exited. RD now registers its vehicle controls through `vehicle:addActionEvent(...)` using FS25's supplied `isActiveForInput` state, matching HelperProfiles, and player-context cleanup no longer removes vehicle-owned RD events. The alpha.5 localisation fix and passive AutoDrive post-start observation are retained.
 
 There are no intentional changes to AutoDrive/Courseplay start, stop, wake, HelperProfiles assignment or persistence behaviour.
 
