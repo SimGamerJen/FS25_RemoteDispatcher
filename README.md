@@ -4,9 +4,9 @@ Remote Dispatcher is a single-player Farming Simulator 25 script mod for remotel
 
 ## Current status
 
-**v0.3.0.5 — alpha.6 maintenance release**
+**v0.3.0.6 — alpha.7 input-default test candidate**
 
-Version 0.3.0.5 ports the vehicle-input fix now used by HelperProfiles after both mods exhibited the same loss of bindings in particular vehicles. RD no longer assumes `Vehicle.registerActionEvents` passes `isActiveForInput` as its second hook argument; it explicitly queries `vehicle:getIsActiveForInput()` and registers through the vehicle's own action-event table. This fix was validated in-game on the previously problematic Zetor Crystal 16045 and Massey Ferguson 8570 across two saves. The alpha.5 localisation fix and passive AutoDrive post-start diagnostics are retained.
+Version 0.3.0.6 changes only the default live Remote Dispatcher modifier pair from **Left Ctrl + Left Alt** to **Left Shift + Left Alt**. This is intended to avoid FS25's visible crouch action when Ctrl is pressed during cinematic remote dispatch. The alpha.6 vehicle-input fix, localisation fix and passive AutoDrive post-start diagnostics are retained.
 
 There are no intentional changes to AutoDrive/Courseplay start, stop, wake, HelperProfiles assignment or persistence behaviour.
 
@@ -19,7 +19,7 @@ HelperProfiles 2.1.1.0: https://github.com/SimGamerJen/FS25_HelperProfiles/relea
 Remote Dispatcher separates configuration from live targeting:
 
 - **Management GUI** — configure each vehicle's AutoDrive/Courseplay choice and HelperProfiles worker assignment.
-- **In-game target selector** — compact HUD used to choose the retained vehicle that `Ctrl + Alt + R` will control.
+- **In-game target selector** — compact HUD used to choose the retained vehicle that `Shift + Alt + R` will control.
 
 Browsing the Management GUI does **not** change the live target.
 
@@ -27,15 +27,15 @@ Browsing the Management GUI does **not** change the live target.
 
 The live controls are available both **on foot and while controlling another vehicle**:
 
-- **Ctrl + Alt + D** — toggle the in-game target selector.
-- **Ctrl + Alt + J** — open Remote Dispatcher Management.
+- **Shift + Alt + D** — toggle the in-game target selector.
+- **Shift + Alt + J** — open Remote Dispatcher Management.
 - **=** — next target while the selector is visible.
 - **-** — previous target while the selector is visible.
-- **Ctrl + Alt + R** — remotely start/stop the retained target.
+- **Shift + Alt + R** — remotely start/stop the retained target.
 - Management: **X** — change AutoDrive/Courseplay for the highlighted vehicle.
 - Management: **C** — assign the highlighted worker to the highlighted vehicle.
 
-`Ctrl + Alt + J` replaces the original `Ctrl + Alt + M` Management shortcut because current AutoDrive releases use `Ctrl + Alt + M` for notification history.
+Management remains on **J** rather than the original **M** because current AutoDrive releases use `Ctrl + Alt + M` for notification history. The alpha.7 candidate changes only the modifier pair.
 
 All actions are normal FS25 input actions and can be remapped.
 
@@ -78,11 +78,11 @@ For a useful issue report, include `log.txt`, the `rdStatus` output, the vehicle
 ## Typical workflow
 
 1. Prepare the target vehicle's AD destination/mode or CP job normally.
-2. Use **Ctrl + Alt + J** if its automation or worker assignment needs changing.
-3. Toggle the live selector with **Ctrl + Alt + D**.
+2. Use **Shift + Alt + J** if its automation or worker assignment needs changing.
+3. Toggle the live selector with **Shift + Alt + D**.
 4. Use **- / =** to choose the target vehicle.
 5. Continue driving, move away, or position the camera as required.
-6. Press **Ctrl + Alt + R** to start or stop the retained remote target.
+6. Press **Shift + Alt + R** to start or stop the retained remote target.
 
 The distant-vehicle wake logic keeps the remotely dispatched vehicle active long enough for AD/CP to begin without player proximity.
 

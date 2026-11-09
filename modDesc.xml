@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="110" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
     <author>SimGamerJen</author>
-    <version>0.3.0.5</version>
+    <version>0.3.0.6</version>
     <iconFilename>RemoteDispatcher.dds</iconFilename>
 
     <title><en>Remote Dispatcher</en></title>
     <description><en><![CDATA[
 Remote Dispatcher remotely starts and stops already-prepared AutoDrive and Courseplay tasks without entering the target vehicle.
 
-Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained target, then press Ctrl+Alt+R to start or stop that vehicle remotely. The selector, target cycling and remote action are available both on foot and while driving another vehicle.
+Use the management screen to configure each vehicle's automation provider and HelperProfiles worker assignment. Use the lightweight in-game selector to choose the retained target, then press Shift+Alt+R to start or stop that vehicle remotely. The selector, target cycling and remote action are available both on foot and while driving another vehicle.
 
-Version 0.3.0.5 ports the HelperProfiles vehicle-input fix after both mods showed the same vehicle-specific binding loss. Remote Dispatcher now queries vehicle:getIsActiveForInput() during Vehicle.registerActionEvents instead of assuming the hook callback supplies an input-active boolean. Vehicle actions are owned by the vehicle action-event table, while on-foot cleanup removes only its own action IDs. Dispatch behaviour is unchanged. This public early alpha is released and supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
+Version 0.3.0.6 changes only the default live Remote Dispatcher keyboard chords from Ctrl+Alt to Left Shift+Left Alt. This avoids the visible crouch caused by FS25's Ctrl binding during cinematic remote dispatch. The alpha.6 vehicle-input fix and all dispatch behaviour are unchanged. This early alpha remains supported with HelperProfiles 2.1.1.0, whose Integration API v7 provides scoped named-worker dispatch.
 
 Early alpha. Single-player only. Back up important savegames before testing.
     ]]></en></description>
 
     <changelog><en><![CDATA[
+0.3.0.6:
+- Changed the default live RD modifier pair from Left Ctrl+Left Alt to Left Shift+Left Alt.
+- Selector: Shift+Alt+D; Management: Shift+Alt+J; Remote action: Shift+Alt+R.
+- Previous/next target remain - and =.
+- No dispatch, wake, vehicle-input lifecycle, HelperProfiles integration, persistence or localisation behaviour changes.
+
 0.3.0.5:
 - Ported the HelperProfiles vehicle-input fix for vehicle-specific binding loss.
 - Vehicle.registerActionEvents now queries vehicle:getIsActiveForInput() directly; its second hook argument is not treated as an input-active flag.
@@ -95,10 +101,10 @@ Early alpha. Single-player only. Back up important savegames before testing.
 
     <inputBinding>
         <actionBinding action="RDC_TOGGLE_SELECTOR">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_d" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lalt KEY_d" />
         </actionBinding>
         <actionBinding action="RDC_OPEN_MANAGEMENT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_j" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lalt KEY_j" />
         </actionBinding>
         <actionBinding action="RDC_CYCLE_TARGET">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_equals" />
@@ -107,7 +113,7 @@ Early alpha. Single-player only. Back up important savegames before testing.
             <binding device="KB_MOUSE_DEFAULT" input="KEY_minus" />
         </actionBinding>
         <actionBinding action="RDC_REMOTE_ACTION">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_r" />
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lalt KEY_r" />
         </actionBinding>
         <actionBinding action="RDC_GUI_PROVIDER">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_x" />

@@ -1,4 +1,4 @@
--- FS25_RemoteDispatcher v0.3.0.5
+-- FS25_RemoteDispatcher v0.3.0.6
 -- Register Remote Dispatcher live actions through the same FS25 vehicle
 -- action-event lifecycle used by HelperProfiles.
 --
@@ -11,7 +11,7 @@ if RemoteDispatcher == nil then
     return
 end
 
-RemoteDispatcher.VERSION = "0.3.0.5"
+RemoteDispatcher.VERSION = "0.3.0.6"
 RemoteDispatcher.vehicleInputHookInstalled = RemoteDispatcher.vehicleInputHookInstalled == true
 RemoteDispatcher.vehicleInputMode = "vehicleAddActionEvent/getIsActiveForInput"
 RemoteDispatcher._vehicleInputLogged = RemoteDispatcher._vehicleInputLogged or setmetatable({}, {__mode = "k"})
